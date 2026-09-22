@@ -257,7 +257,7 @@ var citySelect=document.getElementById('filterCity');
 cityKeys.sort().forEach(function(c){
 var opt=document.createElement('option');
 opt.value=c;
-opt.textContent=c+' ('+cities[c]+')';
+opt.textContent=c;
 citySelect.appendChild(opt);
 });
 
