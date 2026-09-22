@@ -358,10 +358,11 @@ renderPagination();
 updateSortHeaders();
 }
 
+function plural(n,a){n=Math.abs(n)%100;var n1=n%10;if(n>10&&n<20)return a[2];if(n1>1&&n1<5)return a[1];if(n1===1)return a[0];return a[2];}
 function renderPagination(){
 var totalPages=Math.max(1,Math.ceil(filteredRows.length/pageSize));
 var pg=document.getElementById('pagination');
-var html='<span class="info">'+filteredRows.length+' записей</span>';
+var html='<span class="info">'+filteredRows.length+' '+plural(filteredRows.length,['запись','записи','записей'])+'</span>';
 html+='<button '+(currentPage<=1?'disabled':'')+' onclick="window.__goPage('+(currentPage-1)+')">Пред</button>';
 var startP=Math.max(1,currentPage-3);
 var endP=Math.min(totalPages,currentPage+3);
