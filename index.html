@@ -16,6 +16,9 @@ body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica
 .data-date b{color:#e64c3d;font-weight:500}
 .topbar-phone{display:flex;align-items:center;gap:8px;font-size:14px;color:#4f4f4f;white-space:nowrap}
 .topbar-phone b{color:#e64c3d;font-weight:600;font-size:16px}
+.tbl thead th .note-mark{color:#e64c3d;font-size:14px;vertical-align:super}
+.table-note{font-size:12px;color:#8a8f95;margin-top:14px;line-height:1.5}
+.table-note sup{color:#e64c3d;font-size:11px}
 .hero{background:#2d3132;color:#fff}
 .hero-inner{max-width:1400px;margin:0 auto;padding:48px 24px 40px}
 .hero h1{font-family:'TCLSans-Unity-Medium',sans-serif;font-weight:500;font-size:32px;line-height:1.25;color:#fff;text-align:center}
@@ -160,7 +163,7 @@ body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica
 <th data-col="3">Авторизации <span class="sort-arrow"></span></th>
 <th data-col="4">Телефон <span class="sort-arrow"></span></th>
 <th data-col="5">Адрес <span class="sort-arrow"></span></th>
-<th data-col="6">Время работы <span class="sort-arrow"></span></th>
+<th data-col="6">Время работы <sup class="note-mark">*</sup> <span class="sort-arrow"></span></th>
 </tr>
 </thead>
 <tbody id="tableBody"></tbody>
@@ -169,6 +172,7 @@ body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica
 <div class="pagination" id="pagination"></div>
 </div>
 <div class="data-date">Данные актуальны на <b>21.09.2026</b></div>
+<div class="table-note"><sup>*</sup> Информация о времени работы опубликована на основе данных, предоставленных сервисными центрами. Уточняйте время работы перед визитом в сервисный центр.</div>
 </div>
 
 
