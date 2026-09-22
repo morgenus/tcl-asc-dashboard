@@ -407,8 +407,11 @@ document.getElementById('filterCity').addEventListener('change',applyFilters);
 document.getElementById('filterAuth').addEventListener('change',applyFilters);
 document.getElementById('filterSearch').addEventListener('input',applyFilters);
 
-sortRows();
-renderTable();
+applyFilters();
+
+window.addEventListener('pageshow',function(e){
+if(!e.persisted) applyFilters();
+});
 
 })();
 </script>
