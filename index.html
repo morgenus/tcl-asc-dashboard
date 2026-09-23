@@ -336,7 +336,7 @@ var displayAuths=selectedAuth?r.auths.filter(function(a){return a===selectedAuth
 var authTags=displayAuths.map(function(a){
 return '<span class="auth-tag">'+escapeHtml(a)+'</span>';
 }).join(' ');
-var phoneHtml=r.phone?('<a class="phone-link" href="'+telHref(r.phone)+'">'+escapeHtml(r.phone)+'</a>'):'';
+var phoneHtml=r.phone&&r.phone!=='Не указано'?('<a class="phone-link" href="'+telHref(r.phone)+'">'+escapeHtml(r.phone)+'</a>'):escapeHtml(r.phone||'');
 html+='<tr>'
 +'<td class="cell-name" data-label="Название">'+escapeHtml(r.name)+'</td>'
 +'<td data-label="Город">'+escapeHtml(r.city)+'</td>'
