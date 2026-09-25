@@ -406,7 +406,13 @@ renderTable();
 
 document.getElementById('filterCity').addEventListener('change',applyFilters);
 document.getElementById('filterAuth').addEventListener('change',applyFilters);
-document.getElementById('filterSearch').addEventListener('input',applyFilters);
+document.getElementById('filterSearch').addEventListener('input',function(){
+var v=document.getElementById('filterSearch').value;
+if(v){
+document.getElementById('filterCity').value='';
+}
+applyFilters();
+});
 
 applyFilters();
 
