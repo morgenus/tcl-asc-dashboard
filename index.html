@@ -213,8 +213,9 @@ var data=serviceCentersData;
 
 var uniqueCenters={};
 data.forEach(function(d){
-if(!uniqueCenters[d.rascNo]){
-uniqueCenters[d.rascNo]={
+var ck=d.rascNo+'\u0000'+d.address;
+if(!uniqueCenters[ck]){
+uniqueCenters[ck]={
 rascNo:d.rascNo,
 name:d.name,
 city:d.city,
@@ -226,8 +227,8 @@ auths:[]
 };
 }
 var authType=d.auth.replace('TCL-RUS ','').replace(/[()]/g,'');
-if(uniqueCenters[d.rascNo].auths.indexOf(authType)===-1){
-uniqueCenters[d.rascNo].auths.push(authType);
+if(uniqueCenters[ck].auths.indexOf(authType)===-1){
+uniqueCenters[ck].auths.push(authType);
 }
 });
 
