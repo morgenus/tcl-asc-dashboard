@@ -404,8 +404,14 @@ renderTable();
 });
 }
 
-document.getElementById('filterCity').addEventListener('change',applyFilters);
-document.getElementById('filterAuth').addEventListener('change',applyFilters);
+document.getElementById('filterCity').addEventListener('change',function(){
+document.getElementById('filterSearch').value='';
+applyFilters();
+});
+document.getElementById('filterAuth').addEventListener('change',function(){
+document.getElementById('filterSearch').value='';
+applyFilters();
+});
 document.getElementById('filterSearch').addEventListener('input',function(){
 var v=document.getElementById('filterSearch').value;
 if(v){
