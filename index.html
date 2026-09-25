@@ -420,6 +420,16 @@ document.getElementById('filterCity').value='';
 applyFilters();
 });
 
+document.getElementById('tableBody').addEventListener('click',function(e){
+var t=e.target;
+if(t&&t.className==='auth-tag'){
+var as=document.getElementById('filterAuth');
+as.value=(as.value===t.textContent)?'':t.textContent;
+document.getElementById('filterSearch').value='';
+applyFilters();
+}
+});
+
 applyFilters();
 
 window.addEventListener('pageshow',function(e){
