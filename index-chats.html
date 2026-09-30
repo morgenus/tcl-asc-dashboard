@@ -27,7 +27,8 @@ body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica
 .chat-launch-live svg{fill:#e64c3d}
 .chat-launch-max svg{fill:#7b4dff}
 .chat-launch-tg svg{fill:#29a9eb}
-.lt-label{opacity:0!important;pointer-events:none!important}
+.lt-label,.lt-baloon,.lt-baloon-wrap,.lt-baloon-txt,.lt-label-touch,.lt-label-block,.lt-label-inner{display:none!important}
+.lt-chat,.lt-xwidget,.lt-xwidget-wrapper,.lt-wrapper-body{position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;margin:0!important}
 .tbl thead th .note-mark{color:#e64c3d;font-size:14px;vertical-align:super}
 .table-note{font-size:13px;color:#111;line-height:1.5}
 .table-note sup{color:#e64c3d;font-size:10px}
@@ -543,21 +544,29 @@ if(btn){
 window.__ltDiag = function(){
   var found = [];
   var all = document.querySelectorAll('div,span,a,button');
-  for(var i=0;i<all.length && found.length<25;i++){
+  for(var i=0;i<all.length && found.length<40;i++){
     var cn = String(all[i].className || '');
     if(cn.indexOf('lt-') === 0){ found.push(cn); }
+  }
+  function geo(sel){
+    var el = document.querySelector(sel);
+    if(!el) return null;
+    var r = el.getBoundingClientRect();
+    var cs = window.getComputedStyle(el);
+    return {
+      sel: sel,
+      rect: {x:Math.round(r.x), y:Math.round(r.y), w:Math.round(r.width), h:Math.round(r.height)},
+      position: cs.position,
+      zIndex: cs.zIndex
+    };
   }
   return {
     ready: ready,
     version: (window.LiveTex && window.LiveTex.version) || null,
-    hasShowActiveWindow: !!(window.LiveTex && window.LiveTex.showActiveWindow),
-    mounted: isWidgetMounted(),
     chatVisible: isChatVisible(),
     launcherFound: !!findLauncher(),
-    launcherClass: (function(){
-      var l = document.querySelector('.lt-label');
-      return l ? l.className : null;
-    })(),
+    viewport: {w: window.innerWidth, h: window.innerHeight},
+    geo: [geo('.lt-chat'), geo('.lt-xwidget'), geo('.lt-wrapper-body'), geo('.lt-label')],
     ltClasses: found
   };
 };
