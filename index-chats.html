@@ -677,18 +677,20 @@ function hasLtAncestor(el){
   return false;
 }
 
-var CHAT_GAP = 24;
+function chatAnchorEl(){
+  return document.querySelector('.table-card') || document.getElementById('ascTitle');
+}
 
 function centerChat(){
   var el = document.querySelector('.lt-chat');
   if(!el) return false;
   var r = el.getBoundingClientRect();
   if(r.width <= 0 || r.height <= 0) return false;
-  var h = document.getElementById('ascTitle');
-  if(!h) return false;
-  var hr = h.getBoundingClientRect();
-  var dx = (hr.left + hr.width / 2) - (r.left + r.width / 2);
-  var dy = (hr.bottom + CHAT_GAP) - r.top;
+  var a = chatAnchorEl();
+  if(!a) return false;
+  var ar = a.getBoundingClientRect();
+  var dx = (ar.left + ar.width / 2) - (r.left + r.width / 2);
+  var dy = (ar.top + ar.height / 2) - (r.top + r.height / 2);
   if(Math.abs(dx) < 1 && Math.abs(dy) < 1) return true;
   var cs = window.getComputedStyle(el);
   var left = parseFloat(cs.left);
@@ -720,6 +722,14 @@ function polish(){
 function startPolish(){
   applyChatAnchor();
   hideOmni();
+  var a = chatAnchorEl();
+  if(a){
+    var ar = a.getBoundingClientRect();
+    var mid = ar.top + ar.height / 2;
+    if(mid < 80 || mid > window.innerHeight - 80){
+      window.scrollTo({top: window.pageYOffset + mid - window.innerHeight / 2, behavior:'smooth'});
+    }
+  }
   var tries = 0;
   var timer = window.setInterval(function(){
     tries++;
