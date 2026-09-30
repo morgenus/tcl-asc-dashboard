@@ -681,7 +681,9 @@ function hasLtAncestor(el){
 }
 
 function chatAnchorEl(){
-  return document.querySelector('.table-card') || document.getElementById('ascTitle');
+  return document.querySelector('.table-scroll') ||
+         document.querySelector('.table-card') ||
+         document.getElementById('ascTitle');
 }
 
 var chatArmed = false;
