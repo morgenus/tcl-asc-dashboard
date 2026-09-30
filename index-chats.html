@@ -703,7 +703,7 @@ function releaseChat(){
   chatShown = true;
 }
 
-var CHAT_TOP_GAP = 32;
+var TARGET_TOP_OFFSET = 130;
 
 function chatVisualBox(){
   var chat = document.querySelector('.lt-chat');
@@ -734,15 +734,12 @@ function chatDelta(){
   var base = chatAnchorEl();
   if(!base) return null;
   var br = base.getBoundingClientRect();
-  var filters = document.querySelector('.filters');
-  var targetTop = box.top;
-  if(filters){
-    targetTop = filters.getBoundingClientRect().bottom + CHAT_TOP_GAP;
-  } else {
-    targetTop = br.top;
-  }
+  var targetTop = br.top + TARGET_TOP_OFFSET;
+  var boxH = box.bottom - box.top;
+  var maxTop = window.innerHeight - boxH - 8;
+  targetTop = Math.max(8, Math.min(targetTop, maxTop));
   return {
-    dx: (br.left + br.width / 2) - ((box.left + box.right) / 2),
+    dx: (br.left + br.width / 2) - (r.left + r.width / 2),
     dy: targetTop - box.top
   };
 }
@@ -791,14 +788,6 @@ function polish(){
 function startPolish(){
   applyChatAnchor();
   hideOmni();
-  var a = chatAnchorEl();
-  if(a){
-    var ar = a.getBoundingClientRect();
-    var mid = ar.top + ar.height / 2;
-    if(mid < 80 || mid > window.innerHeight - 80){
-      window.scrollTo({top: window.pageYOffset + mid - window.innerHeight / 2, behavior:'smooth'});
-    }
-  }
   var tries = 0;
   var timer = window.setInterval(function(){
     tries++;
