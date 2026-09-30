@@ -27,8 +27,7 @@ body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica
 .chat-launch-live svg{fill:#e64c3d}
 .chat-launch-max svg{fill:#7b4dff}
 .chat-launch-tg svg{fill:#29a9eb}
-.lt-label,[class*="lt-label-event"],[class*="lt-label-touch"],[class*="lt-label-block"],[class*="lt-label-inner"],[class*="lt-label-mobile"],[class*="lt-baloon"]{display:none!important}
-.lt-chat,.lt-xwidget,.lt-xwidget-wrapper,.lt-wrapper-body{position:fixed!important;left:var(--chat-cx,50%)!important;top:var(--chat-cy,50%)!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;margin:0!important}
+iframe[src*="omnibutton"],iframe[src*="widget.livetex"]{display:none!important}
 .tbl thead th .note-mark{color:#e64c3d;font-size:14px;vertical-align:super}
 .table-note{font-size:13px;color:#111;line-height:1.5}
 .table-note sup{color:#e64c3d;font-size:10px}
@@ -517,6 +516,7 @@ function applyChatAnchor(){
 
 function openChatWindow(){
   applyChatAnchor();
+  startPolish();
   var attempts = 0;
   function step(){
     attempts++;
@@ -526,7 +526,8 @@ function openChatWindow(){
     }
     window.setTimeout(function(){
       if(isChatVisible()){
-        if(window.__ltShowDiag) window.__ltShowDiag();
+        polish();
+        scheduleDiag();
         return;
       }
       if(clickLauncher()) return;
@@ -653,44 +654,144 @@ window.__ltDiag = function(){
   };
 };
 
+var LT_HIDE_RE = /(lt-label|lt-baloon|lt-mobile-label)/i;
+
+function ltNodes(){
+  var out = [];
+  var all = document.querySelectorAll('body *');
+  for(var i=0;i<all.length;i++){
+    var el = all[i];
+    var cn = String(el.className || '');
+    if(cn.indexOf('lt-') < 0) continue;
+    out.push({el:el, cls:cn, r:el.getBoundingClientRect()});
+  }
+  return out;
+}
+
+function hasLtAncestor(el){
+  var p = el.parentElement;
+  while(p && p !== document.body && p !== document.documentElement){
+    if(String(p.className || '').indexOf('lt-') >= 0) return true;
+    p = p.parentElement;
+  }
+  return false;
+}
+
+function centerChat(){
+  var el = document.querySelector('.lt-chat');
+  if(!el) return false;
+  var r = el.getBoundingClientRect();
+  if(r.width <= 0 || r.height <= 0) return false;
+  var h = document.getElementById('ascTitle');
+  if(!h) return false;
+  var hr = h.getBoundingClientRect();
+  var dx = (hr.left + hr.width / 2) - (r.left + r.width / 2);
+  var dy = (hr.top + hr.height / 2) - (r.top + r.height / 2);
+  if(Math.abs(dx) < 1 && Math.abs(dy) < 1) return true;
+  var cs = window.getComputedStyle(el);
+  var left = parseFloat(cs.left);
+  var top = parseFloat(cs.top);
+  if(isNaN(left)) left = el.offsetLeft;
+  if(isNaN(top)) top = el.offsetTop;
+  if(isNaN(left) || isNaN(top)) return false;
+  var s = el.style;
+  s.setProperty('left', (left + dx) + 'px', 'important');
+  s.setProperty('top', (top + dy) + 'px', 'important');
+  return true;
+}
+
+function hideOmni(){
+  var fs = document.querySelectorAll('iframe');
+  for(var i=0;i<fs.length;i++){
+    var src = String(fs[i].src || '');
+    if(src.indexOf('omnibutton') !== -1){
+      fs[i].style.setProperty('display','none','important');
+    }
+  }
+}
+
+function polish(){
+  hideOmni();
+  return centerChat();
+}
+
+function startPolish(){
+  applyChatAnchor();
+  hideOmni();
+  var tries = 0;
+  var timer = window.setInterval(function(){
+    tries++;
+    polish();
+    if(tries >= 40){ window.clearInterval(timer); }
+  }, 300);
+}
+
+function isDiagMode(){
+  return window.location.search.indexOf('diag=1') !== -1;
+}
+
+function scheduleDiag(){
+  if(!isDiagMode()) return;
+  window.setTimeout(function(){
+    if(window.__ltShowDiag) window.__ltShowDiag();
+  }, 2500);
+}
+
 window.__ltShowDiag = function(){
   var old = document.getElementById('__diagPanel');
   if(old) old.parentNode.removeChild(old);
-  var data = JSON.stringify(window.__ltDiag(), null, 1);
+  var oldBtn = document.getElementById('__diagBtn');
+  if(oldBtn) oldBtn.parentNode.removeChild(oldBtn);
 
-  var btn = document.createElement('button');
-  btn.textContent = 'Скопировать данные';
-  btn.style.cssText = 'display:block;margin:0 0 8px 0;padding:6px 12px;font:12px/1.3 Arial,sans-serif;cursor:pointer;background:#d00;color:#fff;border:0;border-radius:3px';
+  var data = JSON.stringify(window.__ltDiag(), null, 1);
 
   var box = document.createElement('pre');
   box.id = '__diagPanel';
-  box.style.cssText = 'position:fixed;left:6px;top:6px;z-index:2147483647;background:#fff;color:#000;border:2px solid #d00;padding:10px;max-width:94vw;max-height:88vh;overflow:auto;font:11px/1.35 Consolas,monospace;white-space:pre-wrap;text-align:left;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+  box.style.cssText = 'position:fixed;left:6px;top:6px;z-index:2147483647;background:#fff;color:#000;border:2px solid #d00;padding:10px;max-width:94vw;max-height:86vh;overflow:auto;font:11px/1.35 Consolas,monospace;white-space:pre-wrap;text-align:left;box-shadow:0 4px 20px rgba(0,0,0,.4)';
   box.textContent = data;
 
-  btn.addEventListener('click', function(e){
-    e.stopPropagation();
+  var copy = document.createElement('button');
+  copy.textContent = 'Скопировать';
+  var upd = document.createElement('button');
+  upd.textContent = 'Обновить';
+  var close = document.createElement('button');
+  close.textContent = 'Закрыть';
+
+  var bar = document.createElement('div');
+  bar.id = '__diagBtn';
+  bar.style.cssText = 'position:fixed;left:6px;top:6px;z-index:2147483648;display:flex;gap:6px;padding:8px;background:#fff;border:2px solid #d00;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+  [copy, upd, close].forEach(function(b){
+    b.style.cssText = 'padding:6px 12px;font:12px/1.3 Arial,sans-serif;cursor:pointer;background:#d00;color:#fff;border:0;border-radius:3px';
+    bar.appendChild(b);
+  });
+
+  copy.addEventListener('click', function(){
     function fallback(){
       var ta = document.createElement('textarea');
       ta.value = data;
       ta.style.cssText = 'position:fixed;left:-9999px';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); btn.textContent = 'Скопировано!'; }
-      catch(err){ btn.textContent = 'Выделите текст и Ctrl+C'; }
+      try { document.execCommand('copy'); copy.textContent = 'Скопировано!'; }
+      catch(err){ copy.textContent = 'Выделите текст'; }
       document.body.removeChild(ta);
     }
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(data).then(function(){
-        btn.textContent = 'Скопировано!';
-      }, fallback);
-    } else {
-      fallback();
-    }
+      navigator.clipboard.writeText(data).then(function(){ copy.textContent = 'Скопировано!'; }, fallback);
+    } else { fallback(); }
   });
 
+  upd.addEventListener('click', function(){ window.__ltShowDiag(); });
+  close.addEventListener('click', function(){
+    var p = document.getElementById('__diagPanel');
+    var r = document.getElementById('__diagBtn');
+    if(p) p.parentNode.removeChild(p);
+    if(r) r.parentNode.removeChild(r);
+  });
+
+  box.style.top = '48px';
   document.body.appendChild(box);
-  document.body.appendChild(btn);
-  btn.style.cssText = 'position:fixed;left:16px;top:16px;z-index:2147483648;padding:6px 12px;font:12px/1.3 Arial,sans-serif;cursor:pointer;background:#d00;color:#fff;border:0;border-radius:3px;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+  document.body.appendChild(bar);
 };
 
 if(window.location.search.indexOf('diag=1') !== -1){
@@ -699,8 +800,12 @@ if(window.location.search.indexOf('diag=1') !== -1){
   });
 }
 
-window.addEventListener('resize', applyChatAnchor);
+window.addEventListener('resize', function(){
+  applyChatAnchor();
+  polish();
+});
 applyChatAnchor();
+hideOmni();
 })();
 </script>
 
