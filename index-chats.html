@@ -578,19 +578,78 @@ function scanLt(){
   return out;
 }
 
+function cornerScan(){
+  var W = window.innerWidth, H = window.innerHeight;
+  var out = [];
+  var all = document.querySelectorAll('body *');
+  for(var i=0;i<all.length;i++){
+    var el = all[i];
+    var r = el.getBoundingClientRect();
+    if(r.width <= 0 || r.height <= 0) continue;
+    if(r.right < W - 340 || r.bottom < H - 340) continue;
+    if(r.left > W || r.top > H) continue;
+    if(r.width >= W - 2 && r.height >= H - 2) continue;
+    var cs = window.getComputedStyle(el);
+    out.push({
+      tag: el.tagName,
+      id: el.id || null,
+      cls: String(el.className || '').slice(0, 70),
+      x: Math.round(r.x), y: Math.round(r.y),
+      w: Math.round(r.width), h: Math.round(r.height),
+      pos: cs.position, z: cs.zIndex
+    });
+    if(out.length >= 40) break;
+  }
+  return out;
+}
+
+function frames(){
+  var out = [];
+  var fs = document.querySelectorAll('iframe');
+  for(var i=0;i<fs.length;i++){
+    var r = fs[i].getBoundingClientRect();
+    var cs = window.getComputedStyle(fs[i]);
+    out.push({
+      id: fs[i].id || null,
+      src: String(fs[i].src || '').slice(0, 130),
+      x: Math.round(r.x), y: Math.round(r.y),
+      w: Math.round(r.width), h: Math.round(r.height),
+      disp: cs.display
+    });
+  }
+  return out;
+}
+
 window.__ltDiag = function(){
   return {
     ready: ready,
     version: (window.LiveTex && window.LiveTex.version) || null,
     chatVisible: isChatVisible(),
+    chatSel: (function(){
+      var sels = ['.lt-chat', '.lt-xwidget', '.lt-dialog'];
+      for(var i=0;i<sels.length;i++){
+        var el = document.querySelector(sels[i]);
+        if(el){
+          var r = el.getBoundingClientRect();
+          return {
+            sel: sels[i],
+            cls: String(el.className || '').slice(0, 70),
+            x: Math.round(r.x), y: Math.round(r.y),
+            w: Math.round(r.width), h: Math.round(r.height),
+            offW: el.offsetWidth, offH: el.offsetHeight
+          };
+        }
+      }
+      return null;
+    })(),
     launcherFound: !!findLauncher(),
     viewport: {w: window.innerWidth, h: window.innerHeight},
-    anchor: applyChatAnchor() || 'applied',
     anchorVar: (function(){
       var cs = window.getComputedStyle(document.documentElement);
       return {cx: cs.getPropertyValue('--chat-cx'), cy: cs.getPropertyValue('--chat-cy')};
     })(),
-    visibleLt: scanLt()
+    corner: cornerScan(),
+    frames: frames()
   };
 };
 
