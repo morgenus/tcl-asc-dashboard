@@ -473,6 +473,7 @@ if(!e.persisted) applyFilters();
 window.LiveTex = window.LiveTex || {};
 
 var ready = false;
+var MANUAL_MODE = window.location.search.indexOf('manual=1') !== -1;
 
 function isWidgetMounted(){
   return !!document.querySelector('.lt-label-event, .lt-chat, .lt-xwidget, .lt-baloon');
@@ -716,6 +717,11 @@ var chatShown = false;
 function armChat(){
   chatArmed = true;
   chatShown = false;
+  if(MANUAL_MODE){
+    document.documentElement.className = document.documentElement.className.replace(/\s*lt-hide-chat/g, '');
+    chatShown = true;
+    return;
+  }
   document.documentElement.className += ' lt-hide-chat';
 }
 
@@ -792,8 +798,46 @@ function hideOmni(){
   }
 }
 
+var dragBound = false;
+
+function enableDrag(){
+  if(dragBound) return;
+  dragBound = true;
+  var startX = 0, startY = 0, startL = 0, startT = 0, dragging = false;
+  document.addEventListener('mousedown', function(e){
+    var chat = document.querySelector('.lt-chat');
+    if(!chat) return;
+    dragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    var cs = window.getComputedStyle(chat);
+    startL = parseFloat(cs.left);
+    startT = parseFloat(cs.top);
+    if(isNaN(startL)) startL = chat.offsetLeft;
+    if(isNaN(startT)) startT = chat.offsetTop;
+    if(chat.classList) chat.classList.add('manual-drag');
+  }, true);
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    var chat = document.querySelector('.lt-chat');
+    if(!chat) return;
+    e.preventDefault();
+    chat.style.setProperty('left', (startL + (e.clientX - startX)) + 'px', 'important');
+    chat.style.setProperty('top', (startT + (e.clientY - startY)) + 'px', 'important');
+  }, true);
+  document.addEventListener('mouseup', function(){
+    dragging = false;
+    var chat = document.querySelector('.lt-chat');
+    if(chat && chat.classList) chat.classList.remove('manual-drag');
+  }, true);
+}
+
 function polish(){
   hideOmni();
+  if(MANUAL_MODE){
+    enableDrag();
+    return;
+  }
   if(!chatArmed) return;
   if(chatShown){
     placeChat();
@@ -809,6 +853,17 @@ function polish(){
 function startPolish(){
   applyChatAnchor();
   hideOmni();
+  if(MANUAL_MODE){
+    enableDrag();
+    var m = 0;
+    var mt = window.setInterval(function(){
+      enableDrag();
+      hideOmni();
+      m++;
+      if(m >= 40){ window.clearInterval(mt); }
+    }, 200);
+    return;
+  }
   var tries = 0;
   var timer = window.setInterval(function(){
     tries++;
