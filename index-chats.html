@@ -473,11 +473,6 @@ if(!e.persisted) applyFilters();
 window.LiveTex = window.LiveTex || {};
 
 var ready = false;
-var MANUAL_MODE = window.location.search.indexOf('manual=1') !== -1;
-
-function isWidgetMounted(){
-  return !!document.querySelector('.lt-label-event, .lt-chat, .lt-xwidget, .lt-baloon');
-}
 
 function isChatVisible(){
   var els = document.querySelectorAll('.lt-chat, .lt-xwidget, .lt-dialog');
@@ -507,17 +502,7 @@ function clickLauncher(){
   return false;
 }
 
-function applyChatAnchor(){
-  var h = document.getElementById('ascTitle');
-  if(!h) return;
-  var r = h.getBoundingClientRect();
-  var root = document.documentElement;
-  root.style.setProperty('--chat-cx', (r.left + r.width / 2) + 'px');
-  root.style.setProperty('--chat-cy', (r.top + r.height / 2) + 'px');
-}
-
 function openChatWindow(){
-  applyChatAnchor();
   armChat();
   startPolish();
   window.setTimeout(function(){ if(!chatShown) releaseChat(); }, 4000);
@@ -531,13 +516,9 @@ function openChatWindow(){
     window.setTimeout(function(){
       if(isChatVisible()){
         polish();
-        scheduleDiag();
         return;
       }
-      if(clickLauncher()){
-        scheduleDiag();
-        return;
-      }
+      if(clickLauncher()) return;
       if(attempts < 60){
         step();
       } else {
@@ -562,149 +543,6 @@ if(btn){
   });
 }
 
-function scanLt(){
-  var out = [];
-  var all = document.querySelectorAll('*');
-  for(var i=0;i<all.length;i++){
-    var el = all[i];
-    var cn = String(el.className || '');
-    if(cn.indexOf('lt-') < 0) continue;
-    var r = el.getBoundingClientRect();
-    if(r.width <= 0 || r.height <= 0) continue;
-    var cs = window.getComputedStyle(el);
-    out.push({
-      cls: cn,
-      tag: el.tagName,
-      id: el.id || null,
-      x: Math.round(r.x), y: Math.round(r.y),
-      w: Math.round(r.width), h: Math.round(r.height),
-      pos: cs.position,
-      disp: cs.display
-    });
-    if(out.length >= 60) break;
-  }
-  return out;
-}
-
-function cornerScan(){
-  var W = window.innerWidth, H = window.innerHeight;
-  var out = [];
-  var all = document.querySelectorAll('body *');
-  for(var i=0;i<all.length;i++){
-    var el = all[i];
-    var r = el.getBoundingClientRect();
-    if(r.width <= 0 || r.height <= 0) continue;
-    if(r.right < W - 340 || r.bottom < H - 340) continue;
-    if(r.left > W || r.top > H) continue;
-    if(r.width >= W - 2 && r.height >= H - 2) continue;
-    var cs = window.getComputedStyle(el);
-    out.push({
-      tag: el.tagName,
-      id: el.id || null,
-      cls: String(el.className || '').slice(0, 70),
-      x: Math.round(r.x), y: Math.round(r.y),
-      w: Math.round(r.width), h: Math.round(r.height),
-      pos: cs.position, z: cs.zIndex
-    });
-    if(out.length >= 40) break;
-  }
-  return out;
-}
-
-function frames(){
-  var out = [];
-  var fs = document.querySelectorAll('iframe');
-  for(var i=0;i<fs.length;i++){
-    var r = fs[i].getBoundingClientRect();
-    var cs = window.getComputedStyle(fs[i]);
-    out.push({
-      id: fs[i].id || null,
-      src: String(fs[i].src || '').slice(0, 130),
-      x: Math.round(r.x), y: Math.round(r.y),
-      w: Math.round(r.width), h: Math.round(r.height),
-      disp: cs.display
-    });
-  }
-  return out;
-}
-
-function __geo(sel){
-  var el = document.querySelector(sel);
-  if(!el) return null;
-  var r = el.getBoundingClientRect();
-  return {
-    x: Math.round(r.x), y: Math.round(r.y),
-    w: Math.round(r.width), h: Math.round(r.height),
-    docY: Math.round(r.y + window.pageYOffset)
-  };
-}
-
-window.__ltDiag = function(){
-  return {
-    ready: ready,
-    version: (window.LiveTex && window.LiveTex.version) || null,
-    chatVisible: isChatVisible(),
-    chatSel: (function(){
-      var sels = ['.lt-chat', '.lt-xwidget', '.lt-dialog'];
-      for(var i=0;i<sels.length;i++){
-        var el = document.querySelector(sels[i]);
-        if(el){
-          var r = el.getBoundingClientRect();
-          return {
-            sel: sels[i],
-            cls: String(el.className || '').slice(0, 70),
-            x: Math.round(r.x), y: Math.round(r.y),
-            w: Math.round(r.width), h: Math.round(r.height),
-            offW: el.offsetWidth, offH: el.offsetHeight
-          };
-        }
-      }
-      return null;
-    })(),
-    launcherFound: !!findLauncher(),
-    viewport: {w: window.innerWidth, h: window.innerHeight,
-               scrollY: Math.round(window.pageYOffset),
-               docH: Math.round(document.documentElement.scrollHeight)},
-    anchors: {
-      tableScroll: __geo('.table-scroll'),
-      tableCard: __geo('.table-card'),
-      filters: __geo('.filters'),
-      faq: __geo('.faq-section'),
-      hero: __geo('.hero'),
-      chatBox: chatVisualBox()
-    },
-    anchorVar: (function(){
-      var cs = window.getComputedStyle(document.documentElement);
-      return {cx: cs.getPropertyValue('--chat-cx'), cy: cs.getPropertyValue('--chat-cy')};
-    })(),
-    corner: cornerScan(),
-    frames: frames()
-  };
-};
-
-var LT_HIDE_RE = /(lt-label|lt-baloon|lt-mobile-label)/i;
-
-function ltNodes(){
-  var out = [];
-  var all = document.querySelectorAll('body *');
-  for(var i=0;i<all.length;i++){
-    var el = all[i];
-    var cn = String(el.className || '');
-    if(cn.indexOf('lt-') < 0) continue;
-    out.push({el:el, cls:cn, r:el.getBoundingClientRect()});
-  }
-  return out;
-}
-
-function hasLtAncestor(el){
-  var p = el.parentElement;
-  while(p && p !== document.body && p !== document.documentElement){
-    if(String(p.className || '').indexOf('lt-') >= 0) return true;
-    p = p.parentElement;
-  }
-  return false;
-}
-
 function chatAnchorEl(){
   return document.querySelector('.table-scroll') ||
          document.querySelector('.table-card') ||
@@ -717,11 +555,6 @@ var chatShown = false;
 function armChat(){
   chatArmed = true;
   chatShown = false;
-  if(MANUAL_MODE){
-    document.documentElement.className = document.documentElement.className.replace(/\s*lt-hide-chat/g, '');
-    chatShown = true;
-    return;
-  }
   document.documentElement.className += ' lt-hide-chat';
 }
 
@@ -800,46 +633,8 @@ function hideOmni(){
   }
 }
 
-var dragBound = false;
-
-function enableDrag(){
-  if(dragBound) return;
-  dragBound = true;
-  var startX = 0, startY = 0, startL = 0, startT = 0, dragging = false;
-  document.addEventListener('mousedown', function(e){
-    var chat = document.querySelector('.lt-chat');
-    if(!chat) return;
-    dragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
-    var cs = window.getComputedStyle(chat);
-    startL = parseFloat(cs.left);
-    startT = parseFloat(cs.top);
-    if(isNaN(startL)) startL = chat.offsetLeft;
-    if(isNaN(startT)) startT = chat.offsetTop;
-    if(chat.classList) chat.classList.add('manual-drag');
-  }, true);
-  document.addEventListener('mousemove', function(e){
-    if(!dragging) return;
-    var chat = document.querySelector('.lt-chat');
-    if(!chat) return;
-    e.preventDefault();
-    chat.style.setProperty('left', (startL + (e.clientX - startX)) + 'px', 'important');
-    chat.style.setProperty('top', (startT + (e.clientY - startY)) + 'px', 'important');
-  }, true);
-  document.addEventListener('mouseup', function(){
-    dragging = false;
-    var chat = document.querySelector('.lt-chat');
-    if(chat && chat.classList) chat.classList.remove('manual-drag');
-  }, true);
-}
-
 function polish(){
   hideOmni();
-  if(MANUAL_MODE){
-    enableDrag();
-    return;
-  }
   if(!chatArmed) return;
   if(chatShown){
     placeChat();
@@ -853,19 +648,7 @@ function polish(){
 }
 
 function startPolish(){
-  applyChatAnchor();
   hideOmni();
-  if(MANUAL_MODE){
-    enableDrag();
-    var m = 0;
-    var mt = window.setInterval(function(){
-      enableDrag();
-      hideOmni();
-      m++;
-      if(m >= 40){ window.clearInterval(mt); }
-    }, 200);
-    return;
-  }
   var tries = 0;
   var timer = window.setInterval(function(){
     tries++;
@@ -874,88 +657,9 @@ function startPolish(){
   }, 120);
 }
 
-function isDiagMode(){
-  return true;
-}
-
-function scheduleDiag(){
-  if(!isDiagMode()) return;
-  window.setTimeout(function(){
-    if(window.__ltShowDiag) window.__ltShowDiag();
-  }, 2500);
-}
-
-window.__ltShowDiag = function(){
-  var old = document.getElementById('__diagPanel');
-  if(old) old.parentNode.removeChild(old);
-  var oldBtn = document.getElementById('__diagBtn');
-  if(oldBtn) oldBtn.parentNode.removeChild(oldBtn);
-
-  var data;
-  try {
-    data = JSON.stringify(window.__ltDiag(), null, 1);
-  } catch(err){
-    data = 'ОШИБКА СБОРА ДАННЫХ: ' + err.message + '\n\n' + (err.stack || '');
-  }
-
-  var box = document.createElement('pre');
-  box.id = '__diagPanel';
-  box.style.cssText = 'position:fixed;left:6px;top:6px;z-index:2147483647;background:#fff;color:#000;border:2px solid #d00;padding:10px;max-width:94vw;max-height:86vh;overflow:auto;font:11px/1.35 Consolas,monospace;white-space:pre-wrap;text-align:left;box-shadow:0 4px 20px rgba(0,0,0,.4)';
-  box.textContent = data;
-
-  var copy = document.createElement('button');
-  copy.textContent = 'Скопировать';
-  var upd = document.createElement('button');
-  upd.textContent = 'Обновить';
-  var close = document.createElement('button');
-  close.textContent = 'Закрыть';
-
-  var bar = document.createElement('div');
-  bar.id = '__diagBtn';
-  bar.style.cssText = 'position:fixed;left:6px;top:6px;z-index:2147483648;display:flex;gap:6px;padding:8px;background:#fff;border:2px solid #d00;box-shadow:0 4px 20px rgba(0,0,0,.4)';
-  [copy, upd, close].forEach(function(b){
-    b.style.cssText = 'padding:6px 12px;font:12px/1.3 Arial,sans-serif;cursor:pointer;background:#d00;color:#fff;border:0;border-radius:3px';
-    bar.appendChild(b);
-  });
-
-  copy.addEventListener('click', function(){
-    function fallback(){
-      var ta = document.createElement('textarea');
-      ta.value = data;
-      ta.style.cssText = 'position:fixed;left:-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); copy.textContent = 'Скопировано!'; }
-      catch(err){ copy.textContent = 'Выделите текст'; }
-      document.body.removeChild(ta);
-    }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(data).then(function(){ copy.textContent = 'Скопировано!'; }, fallback);
-    } else { fallback(); }
-  });
-
-  upd.addEventListener('click', function(){ window.__ltShowDiag(); });
-  close.addEventListener('click', function(){
-    var p = document.getElementById('__diagPanel');
-    var r = document.getElementById('__diagBtn');
-    if(p) p.parentNode.removeChild(p);
-    if(r) r.parentNode.removeChild(r);
-  });
-
-  box.style.top = '48px';
-  document.body.appendChild(box);
-  document.body.appendChild(bar);
-};
-
-window.setTimeout(function(){
-  if(typeof window.__ltShowDiag === 'function') window.__ltShowDiag();
-}, 1500);
-
 window.addEventListener('resize', function(){
-  applyChatAnchor();
   polish();
 });
-applyChatAnchor();
 hideOmni();
 })();
 </script>
