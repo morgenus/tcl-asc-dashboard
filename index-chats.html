@@ -702,25 +702,46 @@ function releaseChat(){
 
 var CHAT_TOP_GAP = 16;
 
+function chatVisualBox(){
+  var W = window.innerWidth, H = window.innerHeight;
+  var minTop = Infinity, minLeft = Infinity;
+  var maxBottom = -Infinity, maxRight = -Infinity;
+  var all = document.querySelectorAll('body *');
+  for(var i=0;i<all.length;i++){
+    var el = all[i];
+    if(String(el.className || '').indexOf('lt-') < 0) continue;
+    var r = el.getBoundingClientRect();
+    if(r.width <= 0 || r.height <= 0) continue;
+    if(r.width >= W * 0.97 && r.height >= H * 0.97) continue;
+    if(r.top < minTop) minTop = r.top;
+    if(r.left < minLeft) minLeft = r.left;
+    if(r.bottom > maxBottom) maxBottom = r.bottom;
+    if(r.right > maxRight) maxRight = r.right;
+  }
+  if(minTop === Infinity) return null;
+  return {top:minTop, left:minLeft, bottom:maxBottom, right:maxRight};
+}
+
 function chatDelta(){
   var el = document.querySelector('.lt-chat');
   if(!el) return null;
   var r = el.getBoundingClientRect();
   if(r.width <= 0 || r.height <= 0) return null;
+  var box = chatVisualBox();
+  if(!box) return null;
   var base = chatAnchorEl();
   if(!base) return null;
   var br = base.getBoundingClientRect();
-  var cx = br.left + br.width / 2;
-  var cy = br.top + br.height / 2;
   var filters = document.querySelector('.filters');
+  var targetTop = box.top;
   if(filters){
-    var fr = filters.getBoundingClientRect();
-    var h = el.offsetHeight || r.height;
-    cy = fr.bottom + CHAT_TOP_GAP + h / 2;
+    targetTop = filters.getBoundingClientRect().bottom + CHAT_TOP_GAP;
+  } else {
+    targetTop = br.top;
   }
   return {
-    dx: cx - (r.left + r.width / 2),
-    dy: cy - (r.top + r.height / 2)
+    dx: (br.left + br.width / 2) - ((box.left + box.right) / 2),
+    dy: targetTop - box.top
   };
 }
 
