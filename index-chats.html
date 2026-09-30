@@ -484,55 +484,56 @@ function isChatVisible(){
   var els = document.querySelectorAll('.lt-chat, .lt-xwidget, .lt-dialog');
   for(var i=0;i<els.length;i++){
     var el = els[i];
-    if(el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0) return true;
+    var r = el.getBoundingClientRect();
+    if(r.width > 0 && r.height > 0 && el.offsetParent !== null) return true;
   }
   return false;
 }
 
-function findLauncher(){
-  return document.querySelector('.lt-label-event') ||
-         document.querySelector('.lt-chat-label-event') ||
-         document.querySelector('.lt-baloon') ||
-         document.querySelector('.lt-label');
-}
-
-function clickLauncher(){
-  var el = findLauncher();
-  if(!el) return false;
-  try {
-    el.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:window}));
-    return true;
-  } catch(err){
-    try { el.click(); return true; } catch(e2){}
-  }
-  return false;
+function waitReady(){
+  return new Promise(function(resolve){
+    if(ready) return resolve();
+    var check = window.setInterval(function(){
+      if(ready){
+        window.clearInterval(check);
+        resolve();
+      }
+    }, 50);
+    window.setTimeout(function(){
+      window.clearInterval(check);
+      resolve();
+    }, 5000);
+  });
 }
 
 function openChatWindow(){
   armChat();
   startPolish();
   window.setTimeout(function(){ if(!chatShown) releaseChat(); }, 4000);
-  var attempts = 0;
-  function step(){
-    attempts++;
-    var lt = window.LiveTex;
-    if(lt && typeof lt.showActiveWindow === 'function'){
-      try { lt.showActiveWindow(); } catch(err){}
+
+  waitReady().then(function(){
+    var attempts = 0;
+    function step(){
+      attempts++;
+      var lt = window.LiveTex;
+      if(lt && typeof lt.showActiveWindow === 'function'){
+        try { lt.showActiveWindow(); } catch(err){}
+      }
+      window.setTimeout(function(){
+        if(isChatVisible()){
+          polish();
+          return;
+        }
+        if(clickLauncher()) return;
+        if(attempts < 30){
+          step();
+        } else {
+          window.alert('Онлайн-чат сейчас недоступен. Позвоните нам: 8 800 100 8080');
+        }
+      }, 800);
     }
-    window.setTimeout(function(){
-      if(isChatVisible()){
-        polish();
-        return;
-      }
-      if(clickLauncher()) return;
-      if(attempts < 60){
-        step();
-      } else {
-        window.alert('Онлайн-чат сейчас недоступен. Позвоните нам: 8 800 100 8080');
-      }
-    }, 400);
-  }
-  step();
+    step();
+  });
 }
 
 var prevReady = window.LiveTex.onLiveTexReady;
