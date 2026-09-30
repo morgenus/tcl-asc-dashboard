@@ -703,25 +703,19 @@ function releaseChat(){
   chatShown = true;
 }
 
-var CHAT_TOP_GAP = 16;
+var CHAT_TOP_GAP = 32;
 
 function chatVisualBox(){
   var chat = document.querySelector('.lt-chat');
   if(!chat) return null;
   var cr = chat.getBoundingClientRect();
   if(cr.width <= 0 || cr.height <= 0) return null;
-  var pad = 160;
   var box = {top:cr.top, left:cr.left, bottom:cr.bottom, right:cr.right};
-  var maxW = cr.width * 3 + 400;
-  var maxH = cr.height * 3 + 400;
-  var all = document.querySelectorAll('[class*="lt-"]');
+  var all = chat.querySelectorAll('[class*="lt-"]');
   for(var i=0;i<all.length;i++){
-    var el = all[i];
-    var r = el.getBoundingClientRect();
+    var r = all[i].getBoundingClientRect();
     if(r.width <= 0 || r.height <= 0) continue;
-    if(r.width > maxW || r.height > maxH) continue;
-    if(r.left >= cr.right + pad || r.right <= cr.left - pad) continue;
-    if(r.top >= cr.bottom + pad || r.bottom <= cr.top - pad) continue;
+    if(r.width > cr.width * 2 + 200 || r.height > cr.height * 2 + 200) continue;
     if(r.top < box.top) box.top = r.top;
     if(r.left < box.left) box.left = r.left;
     if(r.bottom > box.bottom) box.bottom = r.bottom;
