@@ -470,42 +470,75 @@ if(!e.persisted) applyFilters();
 (function(){
 window.LiveTex = window.LiveTex || {};
 
-function ltReady(fn){
-  var prev = window.LiveTex.onLiveTexReady;
-  window.LiveTex.onLiveTexReady = function(){
-    if(typeof prev === 'function'){ try { prev.call(window.LiveTex); } catch(e){} }
-    fn();
-  };
+var ready = false;
+
+function isWidgetMounted(){
+  return !!document.querySelector('.lt-label-event, .lt-chat, .lt-xwidget, .lt-baloon');
+}
+
+function isChatVisible(){
+  var els = document.querySelectorAll('.lt-chat, .lt-xwidget');
+  for(var i=0;i<els.length;i++){
+    var el = els[i];
+    if(el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0) return true;
+  }
+  return false;
 }
 
 function hideLauncher(){
-  if(window.LiveTex && typeof window.LiveTex.hideLabel === 'function'){
-    try { window.LiveTex.hideLabel(); } catch(err){}
+  var lt = window.LiveTex;
+  if(lt && typeof lt.hideLabel === 'function'){
+    try { lt.hideLabel(); } catch(err){}
   }
+}
+
+function clickLauncher(){
+  var el = document.querySelector('.lt-label-event') ||
+           document.querySelector('.lt-chat-label-event') ||
+           document.querySelector('.lt-baloon');
+  if(!el) return false;
+  try {
+    el.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:window}));
+    return true;
+  } catch(err){
+    try { el.click(); return true; } catch(e2){}
+  }
+  return false;
 }
 
 function openChatWindow(){
   var attempts = 0;
   function tryOpen(){
+    attempts++;
     var lt = window.LiveTex;
     if(lt && typeof lt.showActiveWindow === 'function'){
-      try { lt.showActiveWindow(); return; } catch(err){}
+      try { lt.showActiveWindow(); } catch(err){}
     }
-    attempts++;
-    if(attempts < 60){
-      window.setTimeout(tryOpen, 250);
-    } else {
-      window.alert('Онлайн-чат сейчас недоступен. Позвоните нам: 8 800 100 8080');
+    if(attempts === 2 && lt && typeof lt.showLabel === 'function'){
+      try { lt.showLabel(); } catch(err){}
     }
+    window.setTimeout(function(){
+      if(isChatVisible()) return;
+      if(clickLauncher()) return;
+      if(attempts < 80){
+        tryOpen();
+      } else {
+        window.alert('Онлайн-чат сейчас недоступен. Позвоните нам: 8 800 100 8080');
+      }
+    }, 300);
   }
   tryOpen();
 }
 
-ltReady(function(){
+var prevReady = window.LiveTex.onLiveTexReady;
+window.LiveTex.onLiveTexReady = function(){
+  if(typeof prevReady === 'function'){ try { prevReady.call(window.LiveTex); } catch(e){} }
+  ready = true;
   hideLauncher();
   window.setTimeout(hideLauncher, 1500);
   window.setTimeout(hideLauncher, 4000);
-});
+  window.setTimeout(hideLauncher, 8000);
+};
 
 var btn = document.getElementById('chatLaunchLive');
 if(btn){
@@ -514,6 +547,21 @@ if(btn){
     openChatWindow();
   });
 }
+
+window.__ltDiag = function(){
+  return {
+    ready: ready,
+    version: (window.LiveTex && window.LiveTex.version) || null,
+    hasShowActiveWindow: !!(window.LiveTex && window.LiveTex.showActiveWindow),
+    mounted: isWidgetMounted(),
+    chatVisible: isChatVisible(),
+    labelFound: !!document.querySelector('.lt-label-event'),
+    labelClasses: (function(){
+      var l = document.querySelector('.lt-label');
+      return l ? l.className : null;
+    })()
+  };
+};
 })();
 </script>
 
