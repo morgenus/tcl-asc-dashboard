@@ -533,7 +533,10 @@ function openChatWindow(){
         scheduleDiag();
         return;
       }
-      if(clickLauncher()) return;
+      if(clickLauncher()){
+        scheduleDiag();
+        return;
+      }
       if(attempts < 60){
         step();
       } else {
@@ -711,10 +714,9 @@ function chatVisualBox(){
   var box = {top:cr.top, left:cr.left, bottom:cr.bottom, right:cr.right};
   var maxW = cr.width * 3 + 400;
   var maxH = cr.height * 3 + 400;
-  var all = document.querySelectorAll('body *');
+  var all = document.querySelectorAll('[class*="lt-"]');
   for(var i=0;i<all.length;i++){
     var el = all[i];
-    if(String(el.className || '').indexOf('lt-') < 0) continue;
     var r = el.getBoundingClientRect();
     if(r.width <= 0 || r.height <= 0) continue;
     if(r.width > maxW || r.height > maxH) continue;
@@ -828,7 +830,12 @@ window.__ltShowDiag = function(){
   var oldBtn = document.getElementById('__diagBtn');
   if(oldBtn) oldBtn.parentNode.removeChild(oldBtn);
 
-  var data = JSON.stringify(window.__ltDiag(), null, 1);
+  var data;
+  try {
+    data = JSON.stringify(window.__ltDiag(), null, 1);
+  } catch(err){
+    data = 'ОШИБКА СБОРА ДАННЫХ: ' + err.message + '\n\n' + (err.stack || '');
+  }
 
   var box = document.createElement('pre');
   box.id = '__diagPanel';
