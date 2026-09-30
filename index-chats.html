@@ -700,17 +700,27 @@ function releaseChat(){
   chatShown = true;
 }
 
+var CHAT_TOP_GAP = 16;
+
 function chatDelta(){
   var el = document.querySelector('.lt-chat');
   if(!el) return null;
   var r = el.getBoundingClientRect();
   if(r.width <= 0 || r.height <= 0) return null;
-  var a = chatAnchorEl();
-  if(!a) return null;
-  var ar = a.getBoundingClientRect();
+  var base = chatAnchorEl();
+  if(!base) return null;
+  var br = base.getBoundingClientRect();
+  var cx = br.left + br.width / 2;
+  var cy = br.top + br.height / 2;
+  var filters = document.querySelector('.filters');
+  if(filters){
+    var fr = filters.getBoundingClientRect();
+    var h = el.offsetHeight || r.height;
+    cy = fr.bottom + CHAT_TOP_GAP + h / 2;
+  }
   return {
-    dx: (ar.left + ar.width / 2) - (r.left + r.width / 2),
-    dy: (ar.top + ar.height / 2) - (r.top + r.height / 2)
+    dx: cx - (r.left + r.width / 2),
+    dy: cy - (r.top + r.height / 2)
   };
 }
 
