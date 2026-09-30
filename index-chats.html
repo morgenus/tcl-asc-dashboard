@@ -28,6 +28,7 @@ body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica
 .chat-launch-max svg{fill:#7b4dff}
 .chat-launch-tg svg{fill:#29a9eb}
 iframe[src*="omnibutton"],iframe[src*="widget.livetex"]{display:none!important}
+.lt-hide-chat .lt-chat{visibility:hidden!important}
 .tbl thead th .note-mark{color:#e64c3d;font-size:14px;vertical-align:super}
 .table-note{font-size:13px;color:#111;line-height:1.5}
 .table-note sup{color:#e64c3d;font-size:10px}
@@ -516,7 +517,9 @@ function applyChatAnchor(){
 
 function openChatWindow(){
   applyChatAnchor();
+  armChat();
   startPolish();
+  window.setTimeout(function(){ if(!chatShown) releaseChat(); }, 4000);
   var attempts = 0;
   function step(){
     attempts++;
@@ -681,17 +684,39 @@ function chatAnchorEl(){
   return document.querySelector('.table-card') || document.getElementById('ascTitle');
 }
 
-function centerChat(){
+var chatArmed = false;
+var chatShown = false;
+
+function armChat(){
+  chatArmed = true;
+  chatShown = false;
+  document.documentElement.className += ' lt-hide-chat';
+}
+
+function releaseChat(){
+  document.documentElement.className = document.documentElement.className.replace(/\s*lt-hide-chat/g, '');
+  chatShown = true;
+}
+
+function chatDelta(){
   var el = document.querySelector('.lt-chat');
-  if(!el) return false;
+  if(!el) return null;
   var r = el.getBoundingClientRect();
-  if(r.width <= 0 || r.height <= 0) return false;
+  if(r.width <= 0 || r.height <= 0) return null;
   var a = chatAnchorEl();
-  if(!a) return false;
+  if(!a) return null;
   var ar = a.getBoundingClientRect();
-  var dx = (ar.left + ar.width / 2) - (r.left + r.width / 2);
-  var dy = (ar.top + ar.height / 2) - (r.top + r.height / 2);
-  if(Math.abs(dx) < 1 && Math.abs(dy) < 1) return true;
+  return {
+    dx: (ar.left + ar.width / 2) - (r.left + r.width / 2),
+    dy: (ar.top + ar.height / 2) - (r.top + r.height / 2)
+  };
+}
+
+function placeChat(){
+  var d = chatDelta();
+  if(!d) return false;
+  if(Math.abs(d.dx) < 1 && Math.abs(d.dy) < 1) return true;
+  var el = document.querySelector('.lt-chat');
   var cs = window.getComputedStyle(el);
   var left = parseFloat(cs.left);
   var top = parseFloat(cs.top);
@@ -699,8 +724,8 @@ function centerChat(){
   if(isNaN(top)) top = el.offsetTop;
   if(isNaN(left) || isNaN(top)) return false;
   var s = el.style;
-  s.setProperty('left', (left + dx) + 'px', 'important');
-  s.setProperty('top', (top + dy) + 'px', 'important');
+  s.setProperty('left', (left + d.dx) + 'px', 'important');
+  s.setProperty('top', (top + d.dy) + 'px', 'important');
   return true;
 }
 
@@ -716,7 +741,16 @@ function hideOmni(){
 
 function polish(){
   hideOmni();
-  return centerChat();
+  if(!chatArmed) return;
+  if(chatShown){
+    placeChat();
+    return;
+  }
+  placeChat();
+  var d = chatDelta();
+  if(d && Math.abs(d.dx) < 2 && Math.abs(d.dy) < 2){
+    releaseChat();
+  }
 }
 
 function startPolish(){
@@ -735,7 +769,7 @@ function startPolish(){
     tries++;
     polish();
     if(tries >= 40){ window.clearInterval(timer); }
-  }, 300);
+  }, 120);
 }
 
 function isDiagMode(){
