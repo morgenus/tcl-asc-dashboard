@@ -703,23 +703,29 @@ function releaseChat(){
 var CHAT_TOP_GAP = 16;
 
 function chatVisualBox(){
-  var W = window.innerWidth, H = window.innerHeight;
-  var minTop = Infinity, minLeft = Infinity;
-  var maxBottom = -Infinity, maxRight = -Infinity;
+  var chat = document.querySelector('.lt-chat');
+  if(!chat) return null;
+  var cr = chat.getBoundingClientRect();
+  if(cr.width <= 0 || cr.height <= 0) return null;
+  var pad = 160;
+  var box = {top:cr.top, left:cr.left, bottom:cr.bottom, right:cr.right};
+  var maxW = cr.width * 3 + 400;
+  var maxH = cr.height * 3 + 400;
   var all = document.querySelectorAll('body *');
   for(var i=0;i<all.length;i++){
     var el = all[i];
     if(String(el.className || '').indexOf('lt-') < 0) continue;
     var r = el.getBoundingClientRect();
     if(r.width <= 0 || r.height <= 0) continue;
-    if(r.width >= W * 0.97 && r.height >= H * 0.97) continue;
-    if(r.top < minTop) minTop = r.top;
-    if(r.left < minLeft) minLeft = r.left;
-    if(r.bottom > maxBottom) maxBottom = r.bottom;
-    if(r.right > maxRight) maxRight = r.right;
+    if(r.width > maxW || r.height > maxH) continue;
+    if(r.left >= cr.right + pad || r.right <= cr.left - pad) continue;
+    if(r.top >= cr.bottom + pad || r.bottom <= cr.top - pad) continue;
+    if(r.top < box.top) box.top = r.top;
+    if(r.left < box.left) box.left = r.left;
+    if(r.bottom > box.bottom) box.bottom = r.bottom;
+    if(r.right > box.right) box.right = r.right;
   }
-  if(minTop === Infinity) return null;
-  return {top:minTop, left:minLeft, bottom:maxBottom, right:maxRight};
+  return box;
 }
 
 function chatDelta(){
