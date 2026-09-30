@@ -814,7 +814,7 @@ function startPolish(){
 }
 
 function isDiagMode(){
-  return window.location.search.indexOf('diag=1') !== -1;
+  return true;
 }
 
 function scheduleDiag(){
@@ -886,11 +886,9 @@ window.__ltShowDiag = function(){
   document.body.appendChild(bar);
 };
 
-if(window.location.search.indexOf('diag=1') !== -1){
-  window.addEventListener('load', function(){
-    window.setTimeout(window.__ltShowDiag, 2500);
-  });
-}
+window.setTimeout(function(){
+  if(typeof window.__ltShowDiag === 'function') window.__ltShowDiag();
+}, 1500);
 
 window.addEventListener('resize', function(){
   applyChatAnchor();
