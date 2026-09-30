@@ -730,7 +730,7 @@ function releaseChat(){
   chatShown = true;
 }
 
-var TARGET_TOP_OFFSET = 130;
+
 
 function chatVisualBox(){
   var chat = document.querySelector('.lt-chat');
@@ -751,6 +751,8 @@ function chatVisualBox(){
   return box;
 }
 
+var V_NUDGE = 27;
+
 function chatDelta(){
   var el = document.querySelector('.lt-chat');
   if(!el) return null;
@@ -761,13 +763,13 @@ function chatDelta(){
   var base = chatAnchorEl();
   if(!base) return null;
   var br = base.getBoundingClientRect();
-  var targetTop = br.top + TARGET_TOP_OFFSET;
   var boxH = box.bottom - box.top;
+  var targetTop = br.top + (br.height - r.height) / 2 + V_NUDGE;
   var maxTop = window.innerHeight - boxH - 8;
   targetTop = Math.max(8, Math.min(targetTop, maxTop));
   return {
     dx: (br.left + br.width / 2) - (r.left + r.width / 2),
-    dy: targetTop - box.top
+    dy: targetTop - r.top
   };
 }
 
