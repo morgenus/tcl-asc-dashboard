@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сервисные центры TCL — Реестр АСЦ TCL-RUS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;color:#111;font-size:16px;line-height:1.5}
+.topbar{background:#fff;border-bottom:1px solid #e4e4e4}
+.topbar-inner{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.tcl-logo{display:inline-flex;align-items:center}
+.tcl-logo svg{display:block;width:68px;height:24px}
+.table-meta{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:16px}
+.data-date{font-size:12px;color:#b6bcc3;text-align:right;white-space:nowrap}
+.data-date b{color:#b6bcc3;font-weight:600}
+.topbar-phone{display:flex;align-items:center;gap:8px;font-size:14px;color:#4f4f4f;white-space:nowrap}
+.topbar-phone b{color:#e64c3d;font-weight:600;font-size:16px}
+.topbar-phone a{color:inherit;text-decoration:none}
+.tbl thead th .note-mark{color:#e64c3d;font-size:14px;vertical-align:super}
+.table-note{font-size:13px;color:#111;line-height:1.5}
+.table-note sup{color:#e64c3d;font-size:10px}
+.hero{background:#2d3132;color:#fff}
+.hero-inner{max-width:1400px;margin:0 auto;padding:48px 24px 40px}
+.hero h1{font-family:'TCLSans-Unity-Medium',sans-serif;font-weight:500;font-size:32px;line-height:1.25;color:#fff;text-align:center}
+.hero .sub{font-size:15px;color:#d8d8d8;margin-top:14px;max-width:760px}
+.hero .accent-bar{display:none}
+.section{max-width:1400px;margin:-20px auto 48px;padding:0 24px;position:relative;z-index:5}
+.table-card{background:#fff;border:1px solid #e4e4e4;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.filters{display:flex;flex-wrap:wrap;align-items:center;padding:16px 20px;border-bottom:1px solid #e4e4e4}
+.filters label{font-size:14px;color:#111;font-weight:500;margin-right:8px}
+.filters select,.filters input{padding:8px 12px;border:1px solid #e4e4e4;border-radius:8px;font-size:15px;background:#fff;color:#111;margin-right:16px;font-family:inherit}
+.filters select{min-width:190px}
+.filters input{width:220px}
+.filters select:focus,.filters input:focus{outline:none;border-color:#e64c3d}
+.table-scroll{max-height:520px;overflow-x:auto;overflow-y:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:1150px}
+.tbl thead th{background:#2d3132;color:#fff;padding:11px 12px;font-family:'TCLSans-Unity-Medium',sans-serif;font-weight:500;cursor:pointer;white-space:nowrap;user-select:none;position:sticky;top:0;z-index:2;text-align:center;border-right:1px solid #42494b}
+.tbl thead th:last-child{border-right:none}
+.tbl thead th:hover{color:#eb7064}
+.tbl thead th .sort-arrow{margin-left:4px;font-size:11px;color:#7f8789}
+.tbl thead th.sorted{color:#ff8a7a}
+.tbl thead th.sorted .sort-arrow{color:#ff8a7a}
+.tbl tbody td{padding:9px 12px;border-bottom:1px solid #f0f0f0;border-right:1px solid #f0f0f0;vertical-align:middle;text-align:center}
+.tbl tbody td:last-child{border-right:none}
+.tbl tbody tr:hover{background:#fff7f5}
+.tbl tbody td:nth-child(4){text-align:left;white-space:normal;min-width:260px}
+.tbl tbody td:nth-child(5){white-space:nowrap}
+.tbl tbody td:nth-child(7){text-align:left;white-space:normal;min-width:180px}
+.tbl a{color:#111;text-decoration:none}
+.tbl a:hover{color:#e64c3d;text-decoration:underline}
+.tbl a.phone-link{white-space:nowrap}
+.tbl td a.addr-link{color:#0056b3;text-decoration:none;cursor:pointer;border-bottom:1px dashed #0056b3}
+.tbl td a.addr-link:hover{color:#003d80;border-bottom-color:#003d80}
+.auth-tag{display:inline-block;background:#fff2f0;color:#b93043;padding:2px 10px;border-radius:20px;margin:2px;font-size:12px;white-space:nowrap}
+.pagination{display:flex;align-items:center;padding:14px 20px;border-top:1px solid #e4e4e4;flex-wrap:wrap}
+.pagination button{padding:5px 12px;border:1px solid #e4e4e4;border-radius:8px;background:#fff;color:#111;cursor:pointer;font-size:14px;margin:2px;font-family:inherit;min-width:32px}
+.pagination button:hover{border-color:#e64c3d;color:#e64c3d}
+.pagination button.active{background:#2d3132;border-color:#2d3132;color:#fff}
+.pagination button:disabled{opacity:.4;cursor:default}
+.pagination button:first-child{margin-left:0}
+.pagination .info{font-size:14px;color:#4f4f4f;margin:0 12px;margin-right:auto}
+.pagination .ellipsis{color:#d8d8d8;padding:0 4px}
+.faq-section{max-width:1400px;margin:-8px auto 0;padding:0 24px}
+.faq-card{background:#fff;border:1px solid #e4e4e4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:40px 24px 36px;text-align:center}
+.faq-card .faq-title{display:inline-flex;align-items:center;gap:8px;font-size:18px;color:#e64c3d;max-width:820px;line-height:1.5;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;transition:color .15s}
+.faq-card .faq-title:hover{color:#c93a2c;text-decoration-thickness:2px}
+.faq-card .faq-title svg{width:16px;height:16px;flex-shrink:0}
+.tcl-footer{background:#f9f9f9;border-top:1px solid #eee}
+.tcl-footer .ft-nav{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;min-height:64px}
+.tcl-footer .ft-logo{display:inline-flex;align-items:center;flex-shrink:0}
+.tcl-footer .ft-logo svg{display:block;width:68px;height:24px}
+.tcl-footer .ft-lang{display:flex;align-items:center;font-size:13px;color:#000;white-space:nowrap}
+.tcl-footer .ft-lang .globe{width:20px;height:20px;margin-right:8px;flex-shrink:0}
+.tcl-footer .ft-bottom{max-width:1400px;margin:0 auto;padding:20px 24px 18px;display:flex;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.tcl-footer .ft-policies a{display:inline-block;margin-right:16px;font-size:12px;color:rgba(0,0,0,0.7);line-height:18px;margin-bottom:4px;text-decoration:none}
+.tcl-footer .ft-policies a:hover{color:#e64c3d;text-decoration:underline}
+.tcl-footer .ft-copy{font-size:12px;color:rgba(0,0,0,0.4);line-height:18px;text-align:center}
+@media (max-width:768px){
+.section{margin-top:0}
+.filters select,.filters input{font-size:16px}
+.hero h1{font-size:28px}
+.hero-inner{padding:32px 24px 48px}
+.table-scroll{max-height:none;overflow:visible}
+.table-card{border:none;background:transparent;box-shadow:none;border-radius:0;overflow:visible}
+.tbl{min-width:0;width:100%;border-collapse:separate;border-spacing:0}
+.tbl thead{display:none}
+.tbl tbody,.tbl tr,.tbl td{display:block;width:100%}
+.tbl tbody tr{background:#fff;border:1px solid #e4e4e4;border-radius:12px;margin-bottom:12px;padding:4px 0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.tbl tbody tr:hover{background:#fff}
+.tbl tbody td{display:flex;flex-wrap:wrap;align-items:flex-start;gap:4px 12px;padding:8px 16px;border:0;border-bottom:1px solid #f4f4f4;text-align:left;white-space:normal;min-width:0}
+.tbl tbody td:last-child{border-bottom:0}
+.tbl tbody td::before{content:attr(data-label);flex:0 0 100px;color:#8a8f95;font-size:12px;line-height:20px;font-weight:500}
+.tbl tbody td.cell-name{display:block;padding:14px 16px 10px;font-family:'TCLSans-Unity-Medium',sans-serif;font-weight:500;font-size:16px;line-height:22px;color:#111;border-bottom:1px solid #ececec}
+.tbl tbody td.cell-name::before{display:none}
+.tbl tbody td[data-label="Телефон"] a.phone-link{color:#e64c3d;font-weight:500}
+.pagination{background:#fff;border:1px solid #e4e4e4;border-radius:12px;padding:12px 16px;margin-top:4px}
+.pagination .info{flex-basis:100%;margin:0 0 6px 0}
+}
+@media (max-width:640px){
+.topbar-inner{padding:10px 16px;height:auto}
+.topbar-phone{font-size:12px}
+.topbar-phone b{font-size:13px}
+.hero-inner{padding:24px 16px 48px}
+.hero h1{font-size:24px;line-height:30px}
+.hero .sub{font-size:14px}
+.section{padding:0 16px 32px}
+.table-meta{flex-direction:column;align-items:flex-start;gap:6px}
+.data-date{text-align:left}
+.filters{padding:14px 16px}
+.filters select,.filters input{width:100%;margin:0 0 10px 0}
+.faq-section{padding:0 12px}
+.faq-card{padding:28px 16px 24px}
+.faq-card .faq-title{font-size:16px}
+.tcl-footer .ft-nav{padding:0 16px;min-height:56px}
+.tcl-footer .ft-bottom{padding:16px;flex-direction:column}
+.tcl-footer .ft-policies a{margin-right:12px}
+.tcl-footer .ft-copy{margin-top:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<div class="topbar-inner">
+<a class="tcl-logo" href="https://www.tcl.com/ru/ru" target="_blank" rel="noopener"><svg viewBox="0 0 68 24" xmlns="http://www.w3.org/2000/svg" aria-label="TCL" role="img">
+<rect fill="#fff" width="68" height="24"></rect>
+<g transform="translate(0,1)" fill="#E64C3D" fill-rule="evenodd">
+<polygon points="0 1.09842528 0 6.87570165 7.71294103 6.87570165 7.71294103 21.1898512 14.6142493 21.1898512 14.6142493 6.87570165 22.3150401 6.87570165 22.3150401 1.09842528"></polygon>
+<path d="M35.8311552,17.0498265 C34.2285451,17.0498265 33.0268912,16.576465 32.0026302,15.5894559 C31.0111746,14.6326614 30.2858082,13.148371 30.2858082,11.1516919 L30.2858082,10.8445105 C30.2858082,8.85160822 31.0111746,7.35724626 32.0026302,6.3991928 C33.0268912,5.41092478 34.2382652,4.95141163 35.8348003,4.95141163 C39.5928543,4.95141163 40.3959819,7.26534363 40.6389857,8.7848844 L46.7566067,8.7848844 C46.6108044,5.73573134 45.2025973,3.58294368 43.2196862,2.14397508 C41.2501403,0.726408469 38.9464641,0 35.9016263,0 C32.1569376,0 29.4814656,0.863632946 27.3017214,2.78477562 C25.0964618,4.74242756 23.9203233,7.83438458 23.9203233,10.918788 L23.9203233,11.0786734 C23.9203233,14.4488561 24.9445844,16.9881384 27.2020898,19.1094526 C29.317438,21.0960602 32.3975114,22.005015 35.8202201,22 C38.8614128,22 41.4676287,21.2572045 43.2695019,19.8484505 C45.2572731,18.2961773 46.6193095,16.1093982 46.780907,13.2302021 L40.6766513,13.2302021 C40.5065486,14.4438204 39.7751071,17.0498265 35.8311552,17.0498265"></path>
+<polygon points="57.1170742 15.683247 57.1170742 1.10346105 50.4709199 1.10346105 50.4709199 21.1885923 68 21.1885923 68 15.683247"></polygon>
+</g>
+</svg></a>
+<div class="topbar-phone"><a href="tel:88001008080"><b>8 800 100 8080</b></a><span>с 8:00 до 20:00 МСК</span></div>
+</div>
+</div>
+
+<div class="hero">
+<div class="hero-inner">
+<h1>Сервисные центры TCL</h1>
+<div class="accent-bar"></div>
+</div>
+</div>
+
+<section class="faq-section">
+<div class="faq-card">
+<a class="faq-title" href="https://www.tcl.com/ru/ru/faq" target="_blank" rel="noopener">Ознакомиться с материалами по использованию и поддержке вашего устройства TCL.<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+</div>
+</section>
+
+<div class="section">
+<div class="table-card">
+<div class="filters">
+<label>Город:</label>
+<select id="filterCity"><option value="">Все города</option></select>
+<label>Тип авторизации:</label>
+<select id="filterAuth"><option value="">Все типы</option></select>
+<label>Поиск:</label>
+<input type="text" id="filterSearch" placeholder="Город или регион...">
+</div>
+<div class="table-scroll">
+<table class="tbl" id="mainTable">
+<thead>
+<tr>
+<th data-col="0">Название <span class="sort-arrow"></span></th>
+<th data-col="1">Город <span class="sort-arrow"></span></th>
+<th data-col="2">Регион <span class="sort-arrow"></span></th>
+<th data-col="3">Авторизации <span class="sort-arrow"></span></th>
+<th data-col="4">Телефон <span class="sort-arrow"></span></th>
+<th data-col="5">Адрес <span class="sort-arrow"></span></th>
+<th data-col="6">Время работы <sup class="note-mark">*</sup> <span class="sort-arrow"></span></th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+<div class="pagination" id="pagination"></div>
+</div>
+<div class="table-meta">
+<div class="table-note"><sup>*</sup> Информация о времени работы опубликована на основе данных, предоставленных сервисными центрами. Уточняйте время работы перед визитом в сервисный центр.</div>
+<div class="data-date">Данные актуальны на <b>22.09.2026</b></div>
+</div>
+</div>
+
+
+<footer class="tcl-footer">
+<div class="ft-nav">
+<a class="ft-logo" href="https://www.tcl.com/ru/ru" target="_blank" rel="noopener"><svg viewBox="0 0 68 24" xmlns="http://www.w3.org/2000/svg" aria-label="TCL" role="img">
+<rect fill="#fff" width="68" height="24"></rect>
+<g transform="translate(0,1)" fill="#E64C3D" fill-rule="evenodd">
+<polygon points="0 1.09842528 0 6.87570165 7.71294103 6.87570165 7.71294103 21.1898512 14.6142493 21.1898512 14.6142493 6.87570165 22.3150401 6.87570165 22.3150401 1.09842528"></polygon>
+<path d="M35.8311552,17.0498265 C34.2285451,17.0498265 33.0268912,16.576465 32.0026302,15.5894559 C31.0111746,14.6326614 30.2858082,13.148371 30.2858082,11.1516919 L30.2858082,10.8445105 C30.2858082,8.85160822 31.0111746,7.35724626 32.0026302,6.3991928 C33.0268912,5.41092478 34.2382652,4.95141163 35.8348003,4.95141163 C39.5928543,4.95141163 40.3959819,7.26534363 40.6389857,8.7848844 L46.7566067,8.7848844 C46.6108044,5.73573134 45.2025973,3.58294368 43.2196862,2.14397508 C41.2501403,0.726408469 38.9464641,0 35.9016263,0 C32.1569376,0 29.4814656,0.863632946 27.3017214,2.78477562 C25.0964618,4.74242756 23.9203233,7.83438458 23.9203233,10.918788 L23.9203233,11.0786734 C23.9203233,14.4488561 24.9445844,16.9881384 27.2020898,19.1094526 C29.317438,21.0960602 32.3975114,22.005015 35.8202201,22 C38.8614128,22 41.4676287,21.2572045 43.2695019,19.8484505 C45.2572731,18.2961773 46.6193095,16.1093982 46.780907,13.2302021 L40.6766513,13.2302021 C40.5065486,14.4438204 39.7751071,17.0498265 35.8311552,17.0498265"></path>
+<polygon points="57.1170742 15.683247 57.1170742 1.10346105 50.4709199 1.10346105 50.4709199 21.1885923 68 21.1885923 68 15.683247"></polygon>
+</g>
+</svg></a>
+<span class="ft-lang"><svg class="globe" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<circle cx="12" cy="12" r="9" stroke="#4f4f4f" stroke-width="1.5" fill="none"></circle>
+<ellipse cx="12" cy="12" rx="4" ry="9" stroke="#4f4f4f" stroke-width="1.2" fill="none"></ellipse>
+<line x1="3" y1="12" x2="21" y2="12" stroke="#4f4f4f" stroke-width="1.2"></line>
+</svg>Russia / Русский</span>
+</div>
+<div class="ft-bottom">
+<div class="ft-copy">Copyright © 2026 TCL.Все права защищены.</div>
+</div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+(function(){
+
+if(typeof serviceCentersData==='undefined'){document.body.innerHTML='<p style="padding:40px;color:#e64c3d">Ошибка: data.js не загружен. Поместите файл data.js рядом с dashboard-tcl-dark.html</p>';return}
+
+var data=serviceCentersData;
+
+var uniqueCenters={};
+data.forEach(function(d){
+var ck=d.rascNo+'\u0000'+d.address;
+if(!uniqueCenters[ck]){
+uniqueCenters[ck]={
+rascNo:d.rascNo,
+name:d.name,
+city:d.city,
+region:d.region.split(',')[0].trim(),
+phone:d.phone,
+address:d.address,
+workHours:d.workHours,
+auths:[]
+};
+}
+var authType=d.auth.replace('TCL-RUS ','').replace(/[()]/g,'');
+if(uniqueCenters[ck].auths.indexOf(authType)===-1){
+uniqueCenters[ck].auths.push(authType);
+}
+});
+
+var tableRows=[];
+for(var key in uniqueCenters){
+if(uniqueCenters.hasOwnProperty(key)){
+var c=uniqueCenters[key];
+tableRows.push({
+name:c.name,
+city:c.city,
+region:c.region,
+auths:c.auths,
+phone:c.phone,
+address:c.address,
+workHours:c.workHours
+});
+}
+}
+
+var cities={};
+tableRows.forEach(function(r){cities[r.city]=(cities[r.city]||0)+1});
+var authTypes={};
+tableRows.forEach(function(r){r.auths.forEach(function(a){authTypes[a]=(authTypes[a]||0)+1})});
+
+var cityKeys=[];
+for(var c in cities){if(cities.hasOwnProperty(c)) cityKeys.push(c)}
+var authKeys=[];
+for(var a in authTypes){if(authTypes.hasOwnProperty(a)) authKeys.push(a)}
+
+var citySelect=document.getElementById('filterCity');
+cityKeys.sort().forEach(function(c){
+var opt=document.createElement('option');
+opt.value=c;
+opt.textContent=c;
+citySelect.appendChild(opt);
+});
+
+var authSelect=document.getElementById('filterAuth');
+authKeys.sort().forEach(function(a){
+var opt=document.createElement('option');
+opt.value=a;
+opt.textContent=a;
+authSelect.appendChild(opt);
+});
+
+var currentPage=1;
+var pageSize=25;
+var sortCol=2;
+var sortDir=1;
+var filteredRows=tableRows.slice();
+var selectedAuth='';
+
+function applyFilters(){
+var city=document.getElementById('filterCity').value;
+var auth=document.getElementById('filterAuth').value;
+var search=document.getElementById('filterSearch').value.toLowerCase();
+selectedAuth=auth;
+
+filteredRows=tableRows.filter(function(r){
+if(city&&r.city!==city) return false;
+if(auth&&r.auths.indexOf(auth)===-1) return false;
+if(search){
+var hay=(r.city+' '+r.region).toLowerCase();
+if(hay.indexOf(search)===-1) return false;
+}
+return true;
+});
+
+sortRows();
+currentPage=1;
+renderTable();
+}
+
+function sortRows(){
+var keys=['name','city','region','auths','phone','address','workHours'];
+var key=keys[sortCol]||'city';
+filteredRows.sort(function(a,b){
+var va=a[key]||'';
+var vb=b[key]||'';
+if(key==='auths'){
+va=va.join(',');
+vb=vb.join(',');
+}
+return va.localeCompare(vb)*sortDir;
+});
+}
+
+function escapeHtml(s){
+return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function telHref(phone){
+if(!phone) return '';
+var digits=String(phone).replace(/[^\d+]/g,'');
+return 'tel:'+digits;
+}
+
+function renderTable(){
+var tbody=document.getElementById('tableBody');
+var start=(currentPage-1)*pageSize;
+var end=Math.min(start+pageSize,filteredRows.length);
+var html='';
+for(var i=start;i<end;i++){
+var r=filteredRows[i];
+var displayAuths=selectedAuth?r.auths.filter(function(a){return a===selectedAuth}):r.auths;
+var authTags=displayAuths.map(function(a){
+return '<span class="auth-tag">'+escapeHtml(a)+'</span>';
+}).join(' ');
+var phoneHtml=r.phone&&r.phone!=='Не указано'?('<a class="phone-link" href="'+telHref(r.phone)+'">'+escapeHtml(r.phone)+'</a>'):escapeHtml(r.phone||'');
+html+='<tr>'
++'<td class="cell-name" data-label="Название">'+escapeHtml(r.name)+'</td>'
++'<td data-label="Город">'+escapeHtml(r.city)+'</td>'
++'<td data-label="Регион">'+escapeHtml(r.region)+'</td>'
++'<td data-label="Авторизации">'+authTags+'</td>'
++'<td data-label="Телефон">'+phoneHtml+'</td>'
++'<td data-label="Адрес"><a class="addr-link" href="https://yandex.ru/maps/?text='+encodeURIComponent(r.region+', '+r.city+', '+r.address)+'" target="_blank" rel="noopener">'+escapeHtml(r.address)+'</a></td>'
++'<td data-label="Время работы">'+escapeHtml(r.workHours)+'</td>'
++'</tr>';
+}
+tbody.innerHTML=html;
+renderPagination();
+updateSortHeaders();
+}
+
+function plural(n,a){n=Math.abs(n)%100;var n1=n%10;if(n>10&&n<20)return a[2];if(n1>1&&n1<5)return a[1];if(n1===1)return a[0];return a[2];}
+function renderPagination(){
+var totalPages=Math.max(1,Math.ceil(filteredRows.length/pageSize));
+var pg=document.getElementById('pagination');
+var html='<span class="info">'+filteredRows.length+' '+plural(filteredRows.length,['запись','записи','записей'])+'</span>';
+html+='<button '+(currentPage<=1?'disabled':'')+' onclick="window.__goPage('+(currentPage-1)+')">Пред</button>';
+var startP=Math.max(1,currentPage-3);
+var endP=Math.min(totalPages,currentPage+3);
+if(startP>1) html+='<button onclick="window.__goPage(1)">1</button>';
+if(startP>2) html+='<span class="ellipsis">…</span>';
+for(var p=startP;p<=endP;p++){
+html+='<button class="'+(p===currentPage?'active':'')+'" onclick="window.__goPage('+p+')">'+p+'</button>';
+}
+if(endP<totalPages-1) html+='<span class="ellipsis">…</span>';
+if(endP<totalPages) html+='<button onclick="window.__goPage('+totalPages+')">'+totalPages+'</button>';
+html+='<button '+(currentPage>=totalPages?'disabled':'')+' onclick="window.__goPage('+(currentPage+1)+')">След</button>';
+pg.innerHTML=html;
+}
+
+window.__goPage=function(p){
+var totalPages=Math.max(1,Math.ceil(filteredRows.length/pageSize));
+if(p<1||p>totalPages) return;
+currentPage=p;
+renderTable();
+document.querySelector('.table-scroll').scrollTop=0;
+};
+
+function updateSortHeaders(){
+var ths=document.querySelectorAll('.tbl thead th');
+for(var i=0;i<ths.length;i++){
+var th=ths[i];
+ths[i].classList.toggle('sorted',i===sortCol);
+var arrow=th.querySelector('.sort-arrow');
+if(i===sortCol){
+arrow.textContent=sortDir===1?'▲':'▼';
+} else {
+arrow.textContent='';
+}
+}
+}
+
+var ths=document.querySelectorAll('.tbl thead th');
+for(var i=0;i<ths.length;i++){
+ths[i].addEventListener('click',function(){
+var col=parseInt(this.getAttribute('data-col'));
+if(sortCol===col){sortDir*=-1} else {sortCol=col;sortDir=1}
+sortRows();
+renderTable();
+});
+}
+
+document.getElementById('filterCity').addEventListener('change',function(){
+document.getElementById('filterSearch').value='';
+applyFilters();
+});
+document.getElementById('filterAuth').addEventListener('change',function(){
+document.getElementById('filterSearch').value='';
+applyFilters();
+});
+document.getElementById('filterSearch').addEventListener('input',function(){
+var v=document.getElementById('filterSearch').value;
+if(v){
+document.getElementById('filterCity').value='';
+}
+applyFilters();
+});
+
+document.getElementById('tableBody').addEventListener('click',function(e){
+var t=e.target;
+if(t&&t.className==='auth-tag'){
+var as=document.getElementById('filterAuth');
+as.value=(as.value===t.textContent)?'':t.textContent;
+document.getElementById('filterSearch').value='';
+applyFilters();
+}
+});
+
+applyFilters();
+
+window.addEventListener('pageshow',function(e){
+if(!e.persisted) applyFilters();
+});
+
+})();
+</script>
+</body>
+</html>
