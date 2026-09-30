@@ -677,6 +677,8 @@ function hasLtAncestor(el){
   return false;
 }
 
+var CHAT_GAP = 24;
+
 function centerChat(){
   var el = document.querySelector('.lt-chat');
   if(!el) return false;
@@ -686,7 +688,7 @@ function centerChat(){
   if(!h) return false;
   var hr = h.getBoundingClientRect();
   var dx = (hr.left + hr.width / 2) - (r.left + r.width / 2);
-  var dy = (hr.top + hr.height / 2) - (r.top + r.height / 2);
+  var dy = (hr.bottom + CHAT_GAP) - r.top;
   if(Math.abs(dx) < 1 && Math.abs(dy) < 1) return true;
   var cs = window.getComputedStyle(el);
   var left = parseFloat(cs.left);
