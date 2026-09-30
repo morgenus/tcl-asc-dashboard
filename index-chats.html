@@ -627,6 +627,17 @@ function frames(){
   return out;
 }
 
+function __geo(sel){
+  var el = document.querySelector(sel);
+  if(!el) return null;
+  var r = el.getBoundingClientRect();
+  return {
+    x: Math.round(r.x), y: Math.round(r.y),
+    w: Math.round(r.width), h: Math.round(r.height),
+    docY: Math.round(r.y + window.pageYOffset)
+  };
+}
+
 window.__ltDiag = function(){
   return {
     ready: ready,
@@ -650,7 +661,17 @@ window.__ltDiag = function(){
       return null;
     })(),
     launcherFound: !!findLauncher(),
-    viewport: {w: window.innerWidth, h: window.innerHeight},
+    viewport: {w: window.innerWidth, h: window.innerHeight,
+               scrollY: Math.round(window.pageYOffset),
+               docH: Math.round(document.documentElement.scrollHeight)},
+    anchors: {
+      tableScroll: __geo('.table-scroll'),
+      tableCard: __geo('.table-card'),
+      filters: __geo('.filters'),
+      faq: __geo('.faq-section'),
+      hero: __geo('.hero'),
+      chatBox: chatVisualBox()
+    },
     anchorVar: (function(){
       var cs = window.getComputedStyle(document.documentElement);
       return {cx: cs.getPropertyValue('--chat-cx'), cy: cs.getPropertyValue('--chat-cy')};
