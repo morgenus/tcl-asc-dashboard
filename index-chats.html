@@ -580,6 +580,17 @@ function pinBottomRight(){
   }
 }
 
+function isChatOpen(){
+  var els = document.querySelectorAll('.lt-chat');
+  for(var i=0;i<els.length;i++){
+    var el = els[i];
+    var r = el.getBoundingClientRect();
+    var op = parseFloat(getComputedStyle(el).opacity);
+    if(r.width > 0 && r.height > 0 && op > 0.5) return true;
+  }
+  return false;
+}
+
 function isFullyVisible(){
   var els = document.querySelectorAll('.lt-chat');
   for(var i=0;i<els.length;i++){
@@ -592,7 +603,11 @@ function isFullyVisible(){
 }
 
 function openChatWindow(){
-  if(opened){ pinBottomRight(); return; }
+  if(opened){
+    if(!isChatOpen()) callShowActiveWindow();
+    pinBottomRight();
+    return;
+  }
   opened = true;
   if(ready){
     callShowActiveWindow();
