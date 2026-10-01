@@ -529,13 +529,36 @@ function clickLauncher(){
   return false;
 }
 
+function pinBottomRight(){
+  var els = document.querySelectorAll('.lt-chat, .lt-welcome, .lt-wrapper');
+  for(var i=0;i<els.length;i++){
+    var el = els[i];
+    var r = el.getBoundingClientRect();
+    if(r.width <= 0 || r.height <= 0) continue;
+    var s = el.style;
+    s.setProperty('position','fixed','important');
+    s.setProperty('top','auto','important');
+    s.setProperty('left','auto','important');
+    s.setProperty('right','20px','important');
+    s.setProperty('bottom','20px','important');
+    s.setProperty('transform','none','important');
+    s.setProperty('margin','0','important');
+    s.setProperty('max-width','calc(100vw - 40px)','important');
+    s.setProperty('max-height','calc(100vh - 40px)','important');
+  }
+}
+
 function openChatWindow(){
-  if(opened){ callShowActiveWindow(); return; }
+  if(opened){ callShowActiveWindow(); pinBottomRight(); return; }
   opened = true;
   callShowActiveWindow();
   var tries = 0;
   var iv = setInterval(function(){
-    if(isChatVisible()){ clearInterval(iv); return; }
+    if(isChatVisible()){
+      clearInterval(iv);
+      pinBottomRight();
+      return;
+    }
     tries++;
     if(tries < 40){
       callShowActiveWindow();
@@ -572,6 +595,9 @@ function hideOmni(){
 
 hideOmni();
 setInterval(hideOmni, 1000);
+setInterval(function(){
+  if(isChatVisible()) pinBottomRight();
+}, 400);
 })();
 </script>
 
