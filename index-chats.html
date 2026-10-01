@@ -530,7 +530,7 @@ function clickLauncher(){
   return false;
 }
 
-function pinElement(el, off){
+function pinElement(el, off, shrink){
   var s = el.style;
   s.setProperty('position','fixed','important');
   s.setProperty('top','auto','important');
@@ -539,17 +539,25 @@ function pinElement(el, off){
   s.setProperty('bottom', off+'px','important');
   s.setProperty('transform','none','important');
   s.setProperty('margin','0','important');
+  s.setProperty('min-width','0','important');
+  s.setProperty('min-height','0','important');
   s.setProperty('max-width','calc(100vw - '+(off*2)+'px)','important');
   s.setProperty('max-height','calc(100vh - '+(off*2)+'px)','important');
+  if(shrink){
+    s.setProperty('width','min(310px, calc(100vw - '+(off*2)+'px))','important');
+    s.setProperty('height','min(410px, calc(100vh - '+(off*2)+'px))','important');
+  }
 }
 
 function pinBottomRight(){
   var off = 20;
   var wrap = document.querySelector('.lt-widget-wrap');
   if(wrap){
-    var r = wrap.getBoundingClientRect();
-    if(r.width > 0 || r.height > 0){
-      pinElement(wrap, off);
+    pinElement(wrap, off);
+    if((wrap.className.indexOf('lt-widget-hidden') !== -1) || parseFloat(getComputedStyle(wrap).opacity) < 1){
+      wrap.className = wrap.className.replace('lt-widget-hidden','');
+      wrap.style.setProperty('opacity','1','important');
+      wrap.style.setProperty('visibility','visible','important');
     }
   }
   var els = document.querySelectorAll('.lt-chat, .lt-welcome, .lt-wrapper, .lt-offline, .lt-call-request');
@@ -557,7 +565,16 @@ function pinBottomRight(){
     var el = els[i];
     var rr = el.getBoundingClientRect();
     if(rr.width > 0 && rr.height > 0){
-      pinElement(el, off);
+      if(el.className.indexOf('lt-chat') !== -1){
+        pinElement(el, off, true);
+        var op = parseFloat(getComputedStyle(el).opacity);
+        if(op < 1){
+          el.style.setProperty('opacity','1','important');
+          el.style.setProperty('visibility','visible','important');
+        }
+      } else {
+        pinElement(el, off);
+      }
     }
   }
 }
