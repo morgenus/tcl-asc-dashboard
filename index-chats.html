@@ -529,22 +529,35 @@ function clickLauncher(){
   return false;
 }
 
+function pinElement(el, off){
+  var s = el.style;
+  s.setProperty('position','fixed','important');
+  s.setProperty('top','auto','important');
+  s.setProperty('left','auto','important');
+  s.setProperty('right', off+'px','important');
+  s.setProperty('bottom', off+'px','important');
+  s.setProperty('transform','none','important');
+  s.setProperty('margin','0','important');
+  s.setProperty('max-width','calc(100vw - '+(off*2)+'px)','important');
+  s.setProperty('max-height','calc(100vh - '+(off*2)+'px)','important');
+}
+
 function pinBottomRight(){
-  var els = document.querySelectorAll('.lt-chat, .lt-welcome, .lt-wrapper');
+  var off = 20;
+  var wrap = document.querySelector('.lt-widget-wrap');
+  if(wrap){
+    var r = wrap.getBoundingClientRect();
+    if(r.width > 0 || r.height > 0){
+      pinElement(wrap, off);
+    }
+  }
+  var els = document.querySelectorAll('.lt-chat, .lt-welcome, .lt-wrapper, .lt-offline, .lt-call-request');
   for(var i=0;i<els.length;i++){
     var el = els[i];
-    var r = el.getBoundingClientRect();
-    if(r.width <= 0 || r.height <= 0) continue;
-    var s = el.style;
-    s.setProperty('position','fixed','important');
-    s.setProperty('top','auto','important');
-    s.setProperty('left','auto','important');
-    s.setProperty('right','20px','important');
-    s.setProperty('bottom','20px','important');
-    s.setProperty('transform','none','important');
-    s.setProperty('margin','0','important');
-    s.setProperty('max-width','calc(100vw - 40px)','important');
-    s.setProperty('max-height','calc(100vh - 40px)','important');
+    var rr = el.getBoundingClientRect();
+    if(rr.width > 0 && rr.height > 0){
+      pinElement(el, off);
+    }
   }
 }
 
