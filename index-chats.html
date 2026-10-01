@@ -592,35 +592,37 @@ function isFullyVisible(){
 }
 
 function openChatWindow(){
-  if(opened){ callShowActiveWindow(); pinBottomRight(); return; }
-  var wasVisible = isChatVisible();
+  if(opened){ pinBottomRight(); return; }
   opened = true;
-  if(!wasVisible) callShowActiveWindow();
-  var tries = 0;
-  var iv = setInterval(function(){
-    if(isFullyVisible() || isChatVisible()){
-      clearInterval(iv);
-      pinBottomRight();
-      return;
-    }
-    tries++;
-    if(tries >= 40){ clearInterval(iv); return; }
-    if(tries === 5){ clickLauncher(); }
-    else if(tries % 10 === 0){ callShowActiveWindow(); }
-  }, 250);
+  if(ready){
+    callShowActiveWindow();
+  } else {
+    pendingOpen = true;
+  }
 }
 
 var prevReady = window.LiveTex.onLiveTexReady;
 window.LiveTex.onLiveTexReady = function(){
   if(typeof prevReady === 'function'){ try { prevReady.call(window.LiveTex); } catch(e){} }
   ready = true;
+  if(pendingOpen){
+    pendingOpen = false;
+    callShowActiveWindow();
+  }
 };
+
+var pendingOpen = false;
 
 var btn = document.getElementById('chatLaunchLive');
 if(btn){
   btn.addEventListener('click', function(e){
     e.preventDefault();
     openChatWindow();
+    setTimeout(function(){
+      if(opened && !ready && !isChatVisible()){
+        callShowActiveWindow();
+      }
+    }, 3000);
   });
 }
 
