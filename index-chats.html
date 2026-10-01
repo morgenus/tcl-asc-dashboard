@@ -580,24 +580,33 @@ function pinBottomRight(){
   }
 }
 
+function isFullyVisible(){
+  var els = document.querySelectorAll('.lt-chat');
+  for(var i=0;i<els.length;i++){
+    var el = els[i];
+    var r = el.getBoundingClientRect();
+    var op = parseFloat(getComputedStyle(el).opacity);
+    if(r.width > 0 && r.height > 0 && op > 0.99) return true;
+  }
+  return false;
+}
+
 function openChatWindow(){
   if(opened){ callShowActiveWindow(); pinBottomRight(); return; }
+  var wasVisible = isChatVisible();
   opened = true;
-  callShowActiveWindow();
+  if(!wasVisible) callShowActiveWindow();
   var tries = 0;
   var iv = setInterval(function(){
-    if(isChatVisible()){
+    if(isFullyVisible() || isChatVisible()){
       clearInterval(iv);
       pinBottomRight();
       return;
     }
     tries++;
-    if(tries < 40){
-      callShowActiveWindow();
-      if(tries % 5 === 0) clickLauncher();
-    } else {
-      clearInterval(iv);
-    }
+    if(tries >= 40){ clearInterval(iv); return; }
+    if(tries === 5){ clickLauncher(); }
+    else if(tries % 10 === 0){ callShowActiveWindow(); }
   }, 250);
 }
 
@@ -634,7 +643,7 @@ function hideOmni(){
 hideOmni();
 setInterval(hideOmni, 1000);
 setInterval(function(){
-  if(isChatVisible()) pinBottomRight();
+  if(opened && isFullyVisible()) pinBottomRight();
 }, 400);
 })();
 </script>
