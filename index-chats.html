@@ -551,13 +551,15 @@ function pinElement(el, off, shrink){
 
 function pinBottomRight(){
   var off = 20;
+  var forceShow = false;
   var wrap = document.querySelector('.lt-widget-wrap');
   if(wrap){
     pinElement(wrap, off);
-    if((wrap.className.indexOf('lt-widget-hidden') !== -1) || parseFloat(getComputedStyle(wrap).opacity) < 1){
-      wrap.className = wrap.className.replace('lt-widget-hidden','');
+    if(wrap.className.indexOf('lt-widget-hidden') !== -1){
+      wrap.className = wrap.className.replace(/\s*lt-widget-hidden\s*/, ' ');
       wrap.style.setProperty('opacity','1','important');
       wrap.style.setProperty('visibility','visible','important');
+      forceShow = true;
     }
   }
   var els = document.querySelectorAll('.lt-chat, .lt-welcome, .lt-wrapper, .lt-offline, .lt-call-request');
@@ -567,8 +569,7 @@ function pinBottomRight(){
     if(rr.width > 0 && rr.height > 0){
       if(el.className.indexOf('lt-chat') !== -1){
         pinElement(el, off, true);
-        var op = parseFloat(getComputedStyle(el).opacity);
-        if(op < 1){
+        if(forceShow){
           el.style.setProperty('opacity','1','important');
           el.style.setProperty('visibility','visible','important');
         }
