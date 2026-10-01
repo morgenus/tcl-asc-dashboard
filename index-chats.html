@@ -29,7 +29,6 @@ body{font-family:'TCLSans-Unity-Book','SF Pro Text','Segoe UI',Roboto,'Helvetica
 .chat-launch-max svg{fill:#7b4dff}
 .chat-launch-tg svg{fill:#29a9eb}
 iframe[src*="omnibutton"],iframe[src*="widget.livetex"]{display:none!important}
-.lt-hide-chat .lt-chat{visibility:hidden!important}
 .tbl thead th .note-mark{color:#e64c3d;font-size:14px;vertical-align:super}
 .table-note{font-size:13px;color:#111;line-height:1.5}
 .table-note sup{color:#e64c3d;font-size:10px}
@@ -479,22 +478,49 @@ window.LiveTex = window.LiveTex || {};
 
 var ready = false;
 
+var opened = false;
+
 function isChatVisible(){
   var els = document.querySelectorAll('.lt-chat, .lt-xwidget, .lt-dialog');
   for(var i=0;i<els.length;i++){
     var el = els[i];
     var r = el.getBoundingClientRect();
-    if(r.width > 0 && r.height > 0 && el.offsetParent !== null) return true;
+    if(r.width > 0 && r.height > 0) return true;
+  }
+  return false;
+}
+
+function callShowActiveWindow(){
+  var lt = window.LiveTex;
+  if(lt && typeof lt.showActiveWindow === 'function'){
+    try { lt.showActiveWindow(); return true; } catch(err){}
+  }
+  return false;
+}
+
+function clickLauncher(){
+  var b = document.getElementById('chatLaunchLive');
+  if(b && typeof b.click === 'function'){
+    try { b.click(); return true; } catch(err){}
   }
   return false;
 }
 
 function openChatWindow(){
-  armChat();
-  var lt = window.LiveTex;
-  if(lt && typeof lt.showActiveWindow === 'function'){
-    try { lt.showActiveWindow(); } catch(err){}
-  }
+  if(opened){ callShowActiveWindow(); return; }
+  opened = true;
+  callShowActiveWindow();
+  var tries = 0;
+  var iv = setInterval(function(){
+    if(isChatVisible()){ clearInterval(iv); return; }
+    tries++;
+    if(tries < 40){
+      callShowActiveWindow();
+      if(tries % 5 === 0) clickLauncher();
+    } else {
+      clearInterval(iv);
+    }
+  }, 250);
 }
 
 var prevReady = window.LiveTex.onLiveTexReady;
@@ -511,41 +537,19 @@ if(btn){
   });
 }
 
-var btn = document.getElementById('chatLaunchLive');
-if(btn){
-  btn.addEventListener('click', function(e){
-    e.preventDefault();
-    openChatWindow();
-  });
-}
-
-var chatArmed = false;
-var chatShown = false;
-
-function armChat(){
-  chatArmed = true;
-  chatShown = false;
-  document.documentElement.className += ' lt-hide-chat';
-}
-
-function releaseChat(){
-  document.documentElement.className = document.documentElement.className.replace(/\s*lt-hide-chat/g, '');
-  chatShown = true;
-}
-
 function hideOmni(){
   var fs = document.querySelectorAll('iframe');
   for(var i=0;i<fs.length;i++){
     var src = String(fs[i].src || '');
     if(src.indexOf('omnibutton') !== -1){
       fs[i].style.setProperty('display','none','important');
-  }
+    }
   }
 }
 
 hideOmni();
+setInterval(hideOmni, 1000);
 })();
-</script>
 </script>
 
 <script type='text/javascript'>
