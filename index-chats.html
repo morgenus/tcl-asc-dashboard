@@ -489,50 +489,12 @@ function isChatVisible(){
   return false;
 }
 
-function waitReady(){
-  return new Promise(function(resolve){
-    if(ready) return resolve();
-    var check = window.setInterval(function(){
-      if(ready){
-        window.clearInterval(check);
-        resolve();
-      }
-    }, 50);
-    window.setTimeout(function(){
-      window.clearInterval(check);
-      resolve();
-    }, 5000);
-  });
-}
-
 function openChatWindow(){
   armChat();
-  startPolish();
-  window.setTimeout(function(){ if(!chatShown) releaseChat(); }, 4000);
-
-  waitReady().then(function(){
-    var attempts = 0;
-    function step(){
-      attempts++;
-      var lt = window.LiveTex;
-      if(lt && typeof lt.showActiveWindow === 'function'){
-        try { lt.showActiveWindow(); } catch(err){}
-      }
-      window.setTimeout(function(){
-        if(isChatVisible()){
-          polish();
-          return;
-        }
-        if(clickLauncher()) return;
-        if(attempts < 30){
-          step();
-        } else {
-          window.alert('Онлайн-чат сейчас недоступен. Позвоните нам: 8 800 100 8080');
-        }
-      }, 800);
-    }
-    step();
-  });
+  var lt = window.LiveTex;
+  if(lt && typeof lt.showActiveWindow === 'function'){
+    try { lt.showActiveWindow(); } catch(err){}
+  }
 }
 
 var prevReady = window.LiveTex.onLiveTexReady;
@@ -549,10 +511,12 @@ if(btn){
   });
 }
 
-function chatAnchorEl(){
-  return document.querySelector('.table-scroll') ||
-         document.querySelector('.table-card') ||
-         document.getElementById('ascTitle');
+var btn = document.getElementById('chatLaunchLive');
+if(btn){
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    openChatWindow();
+  });
 }
 
 var chatArmed = false;
@@ -569,105 +533,19 @@ function releaseChat(){
   chatShown = true;
 }
 
-
-
-function chatVisualBox(){
-  var chat = document.querySelector('.lt-chat');
-  if(!chat) return null;
-  var cr = chat.getBoundingClientRect();
-  if(cr.width <= 0 || cr.height <= 0) return null;
-  var box = {top:cr.top, left:cr.left, bottom:cr.bottom, right:cr.right};
-  var all = chat.querySelectorAll('[class*="lt-"]');
-  for(var i=0;i<all.length;i++){
-    var r = all[i].getBoundingClientRect();
-    if(r.width <= 0 || r.height <= 0) continue;
-    if(r.width > cr.width * 2 + 200 || r.height > cr.height * 2 + 200) continue;
-    if(r.top < box.top) box.top = r.top;
-    if(r.left < box.left) box.left = r.left;
-    if(r.bottom > box.bottom) box.bottom = r.bottom;
-    if(r.right > box.right) box.right = r.right;
-  }
-  return box;
-}
-
-var V_NUDGE = 27;
-
-function chatDelta(){
-  var el = document.querySelector('.lt-chat');
-  if(!el) return null;
-  var r = el.getBoundingClientRect();
-  if(r.width <= 0 || r.height <= 0) return null;
-  var box = chatVisualBox();
-  if(!box) return null;
-  var base = chatAnchorEl();
-  if(!base) return null;
-  var br = base.getBoundingClientRect();
-  var boxH = box.bottom - box.top;
-  var targetTop = br.top + (br.height - r.height) / 2 + V_NUDGE;
-  var maxTop = window.innerHeight - boxH - 8;
-  targetTop = Math.max(8, Math.min(targetTop, maxTop));
-  return {
-    dx: (br.left + br.width / 2) - (r.left + r.width / 2),
-    dy: targetTop - r.top
-  };
-}
-
-function placeChat(){
-  var d = chatDelta();
-  if(!d) return false;
-  if(Math.abs(d.dx) < 1 && Math.abs(d.dy) < 1) return true;
-  var el = document.querySelector('.lt-chat');
-  var cs = window.getComputedStyle(el);
-  var left = parseFloat(cs.left);
-  var top = parseFloat(cs.top);
-  if(isNaN(left)) left = el.offsetLeft;
-  if(isNaN(top)) top = el.offsetTop;
-  if(isNaN(left) || isNaN(top)) return false;
-  var s = el.style;
-  s.setProperty('left', (left + d.dx) + 'px', 'important');
-  s.setProperty('top', (top + d.dy) + 'px', 'important');
-  return true;
-}
-
 function hideOmni(){
   var fs = document.querySelectorAll('iframe');
   for(var i=0;i<fs.length;i++){
     var src = String(fs[i].src || '');
     if(src.indexOf('omnibutton') !== -1){
       fs[i].style.setProperty('display','none','important');
-    }
+  }
   }
 }
 
-function polish(){
-  hideOmni();
-  if(!chatArmed) return;
-  if(chatShown){
-    placeChat();
-    return;
-  }
-  placeChat();
-  var d = chatDelta();
-  if(d && Math.abs(d.dx) < 2 && Math.abs(d.dy) < 2){
-    releaseChat();
-  }
-}
-
-function startPolish(){
-  hideOmni();
-  var tries = 0;
-  var timer = window.setInterval(function(){
-    tries++;
-    polish();
-    if(tries >= 40){ window.clearInterval(timer); }
-  }, 120);
-}
-
-window.addEventListener('resize', function(){
-  polish();
-});
 hideOmni();
 })();
+</script>
 </script>
 
 <script type='text/javascript'>
